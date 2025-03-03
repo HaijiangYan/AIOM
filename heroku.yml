@@ -10,6 +10,4 @@ build:
     NODE_ENV: production
 
 run:
-  web: 
-    command: node server.js
-    type: basic
+  web: node server.js
