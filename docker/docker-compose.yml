@@ -4,7 +4,9 @@ services:
   # When Docker Compose starts this container it will automatically
   # use the Dockerfile in the directory to configure it
   app:
-    build: .
+    build: 
+      context: ..
+      dockerfile: docker/Dockerfile
     image: haijiangyan/mcmcp-allinone:latest
     environment:
       # database 
@@ -25,7 +27,7 @@ services:
     volumes:
       # Maps our current project directory `.` to
       # our working directory in the container
-      - ./:/usr/src/app/
+      - ..:/usr/src/app/
 
   # This is the configuration for our PostgreSQL database container
   # Note the `postgres` name is important, in out Node app when we refer
@@ -57,7 +59,7 @@ services:
       # When the PostgreSQL container is started it will run any scripts
       # provided in the `docker-entrypoint-initdb.d` directory, this connects
       # our seed file to that directory so that it gets run
-      - ./config/database-seed.sql:/docker-entrypoint-initdb.d/database-seed.sql
+      - ../config/database-seed.sql:/docker-entrypoint-initdb.d/database-seed.sql
 
   pgadmin-compose:
         image: dpage/pgadmin4

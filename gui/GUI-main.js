@@ -71,7 +71,7 @@ ipcMain.on('docker', (event, data) => {
   // Example terminal command after .env update
   if (data==='build') {
     event.reply('docker-success', `Experiment is building, after seeing 'Server running on port 8080' below, you can visit "http://localhost:8080" in your local browser to test the experiment`);
-    const dockerComposeFilePath = path.join(__dirname, '..', 'docker-compose.yml');
+    const dockerComposeFilePath = path.join(__dirname, '..', 'docker', 'docker-compose.yml');
     const dockerProcess = spawn('docker', ['compose', '-f', dockerComposeFilePath, 'up', '--build']);
     // Listen for standard output from the Docker process
     dockerProcess.stdout.on('data', (data) => {
@@ -135,7 +135,6 @@ function exportTableToCSV(table, downloadDir) {
       // Create write stream for the CSV file
       const outputFile = path.join(downloadDir, `${table.trim()}.csv`);
       const writeStream = fs.createWriteStream(outputFile);
-
       // Spawn the process with separate arguments
       const child = spawn('docker', [
           'exec',

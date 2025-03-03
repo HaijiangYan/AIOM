@@ -36,7 +36,7 @@ fi
 # Install dependencies if node_modules doesn't exist or if force install is needed
 if [ ! -d "node_modules" ]; then
     echo "Installing npm dependencies..."
-    npm install
+    npm install --no-save electron@33.0.2
     if [ $? -ne 0 ]; then
         echo "Failed to install dependencies."
         read -p "Press Enter to exit..."

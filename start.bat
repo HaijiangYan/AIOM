@@ -32,15 +32,26 @@ if not exist package.json (
 REM Install dependencies if node_modules doesn't exist or if force install is needed
 if not exist node_modules (
     echo Installing npm dependencies...
-    call npm install
+    call npm install --no-save electron@33.0.2
     if %ERRORLEVEL% NEQ 0 (
         echo Failed to install dependencies.
         pause
         exit /b 1
     )
 ) else (
-    echo Dependencies already installed. Checking for updates...
-    call npm ci
+    echo Checking if Electron is installed...
+    if not exist "node_modules\@electron" (
+        echo Installing Electron...
+        call npm install --no-save electron@33.0.2
+        if %ERRORLEVEL% NEQ 0 (
+            echo Failed to install Electron.
+            pause
+            exit /b 1
+        )
+        echo Electron installed successfully.
+    ) else (
+        echo Electron is already installed.
+    )
 )
 
 REM Check if Docker is installed

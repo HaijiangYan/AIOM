@@ -1,6 +1,6 @@
 # select your base image to start with
 FROM node:22.9.0-alpine3.20
-LABEL org.opencontainers.image.authors="haijiang.yan@warwick.ac.uk"
+LABEL org.opencontainers.image.authors="haijiang.yan@warwick"
 # Create app directory
 # this is the location where you will be inside the container
 WORKDIR /usr/src/app
@@ -18,9 +18,9 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-# Make this port accessible from outside the container
-# Necessary for your browser to send HTTP requests to your Node app
-EXPOSE 8080
+ENV PORT=8080
+# Make port accessible
+EXPOSE $PORT
 
 # Command to run when the container is ready
 # Separate arguments as separate values in the array
