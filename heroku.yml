@@ -5,7 +5,7 @@ setup:
 
 build:
   docker:
-    web: docker/Dockerfile
+    web: ./Dockerfile
   config:
     NODE_ENV: production
 
