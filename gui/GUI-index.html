@@ -5,13 +5,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-  <title>MCMCP Setup</title>
+  <title>MCMCP Setup Panel</title>
   <link rel="stylesheet" href="./GUI-style.css">
 </head>
 <body>
-  <h2 style="text-align: center;">Customize your MCMCP study</h2>
+<div class="split-container">
+<div id="settings">
+  <!-- Navigation buttons -->
+  <div class="navigation-buttons">
+    <button id="back" onclick="navigate('back')">Back</button>
+    <button id="proceed" onclick="navigate('proceed')">Proceed</button>
+  </div>
+  <h2 style="text-align: center;">Design your MCMCP</h2>
 
-  <fieldset style="height:140px">
+  <fieldset style="display: block; height:140px; width: 785px; margin: 0 auto;" class="first-appear">
     <legend>Experiment type:</legend>
   
     <div class="experiment-types-container">
@@ -51,6 +58,28 @@
     </div>
   </fieldset><br>
 
+  <div id="diagram_list">
+  <img id="diagram" src="../public/images/MCMCP.png" alt="diagram" style="display: block; margin: 10px auto; width: 700px; max-height: 260px;" class="first-appear">
+  </div>
+
+  <fieldset id="stimuli" style="height:60px" class="second-appear">
+    <legend>Stimuli type:</legend>
+  
+    <div>
+      <input type="checkbox" id="test" name="test" value="test" class="stimuli"/>
+      <label for="test">test (positions of stimuli will be presented to participants)</label>
+    </div>
+
+    <div>
+      <input type="checkbox" id="image" name="image" value="image" class="stimuli"/>
+      <label for="image">image</label>
+      <label class="imageurl">address:</label>
+      <input class="imageurl" id="imageurl_input" type="text" value="http://72.144.77.119:3000/generate" size="40">
+    </div>
+
+  </fieldset>
+
+  <div class="third-appear">
   <span>&#9881;</span> <label>Number of trials: how many trials will an individual participant go through for a single category.</label>
   <input id="n_trial" type="text" value="20" size="5"><br><br>
 
@@ -71,25 +100,9 @@
   
   <span>&#9881;</span> <label>Variance of the proposal function (isotropic Gaussian):</label>
   <input id="proposal_cov" type="text" value="1" size="5"><br><br>
+  </div>
 
-  <fieldset id="stimuli" style="height:60px">
-    <legend>Stimuli type:</legend>
-  
-    <div>
-      <input type="checkbox" id="test" name="test" value="test" class="stimuli"/>
-      <label for="test">test (positions of stimuli will be presented to participants)</label>
-    </div>
-
-    <div>
-      <input type="checkbox" id="image" name="image" value="image" class="stimuli"/>
-      <label for="image">image</label>
-      <label class="imageurl">address:</label>
-      <input class="imageurl" id="imageurl_input" type="text" value="http://72.144.77.119:3000/generate" size="40">
-    </div>
-
-  </fieldset>
-
-  <fieldset id="gatekeeper">
+  <fieldset id="gatekeeper" class="forth-appear">
     <legend>You need a gatekeeper to speep up?</legend>
   
     <div>
@@ -105,26 +118,29 @@
   </fieldset> <br><br>
 
   <!-- define gatekeepers -->
-   <div id="gatekeepers_define">
+   <div id="gatekeepers_define" class="forth-appear">
    </div>
 
+</div>
 
-   <div class="container">
-    <div class="button-column">
-      <button onclick="submitData()">Apply</button>
-      <button id="docker" onclick="submitDocker()" disabled>Build locally</button>
-      <button onclick="download()">Local download</button>
-      <button onclick="deploy_online()" disabled>Deploy online</button>
-      <button onclick="download_online()" disabled>Online download</button>
-      <button onclick="finish()" style="background-color: red;">Finish</button>
-    </div>
-  <!-- <input type="reset" value="Reset"> -->
-    <div class="content-column">
-      <p id="status" style="color: rgb(0, 0, 0);"></p>
-      <div id="output" style="white-space: pre-wrap;"></div>
-    </div>
+
+<div class="container" id="controller">
+  <h2 style="text-align: center;">Controller</h2>
+  <div class="button-column">
+    <button onclick="submitData()">Apply</button>
+    <button id="docker" onclick="submitDocker()" disabled>Build locally</button>
+    <button onclick="download()">Local download</button>
+    <button onclick="deploy_online()" disabled>Deploy online</button>
+    <button onclick="download_online()" disabled>Online download</button>
+    <button onclick="finish()" style="background-color: red;">Finish</button>
   </div>
-
+  <!-- <input type="reset" value="Reset"> -->
+  <div class="content-column">
+    <p id="status" style="color: rgb(0, 0, 0);"></p>
+    <div id="output" style="white-space: pre-wrap;"></div>
+  </div>
+</div>
+</div>
 
 
   <script>
@@ -137,6 +153,8 @@
       $('#gatekeepers_define').html('');
       // console.log($('.experiment-type:checked').val());
       if($("#MCMCP").is(":checked")) {
+        $('#diagram_1').remove();
+        $('#diagram').attr('src', '../public/images/MCMCP.png');
         //show the subboxes checked        
         $(".group-level").show();
         $(".blockwise").hide();
@@ -144,17 +162,24 @@
         $(".gatekeeper").prop('disabled', true);
       }
       else if ($("#blockwise-MCMCP").is(":checked")) {
+        $('#diagram_1').remove();
+        $('#diagram').attr('src', '../public/images/bwMCMCP.png');
           // uncheck the sub boxes and hide it 
         $(".blockwise").show();
         $(".group-level").hide();
         $(".consensus").hide();
         $(".gatekeeper").prop('disabled', false);
       } else if ($("#consensus-MCMCP").is(":checked")) {
+        $('#diagram_1').remove();
+        $('#diagram').attr('src', '../public/images/conMCMCP.png');
         $(".consensus").show();
         $(".blockwise").hide();
         $(".group-level").hide();
         $(".gatekeeper").prop('disabled', true);
       } else {
+        $('#diagram_1').remove();
+        $('#diagram_list').prepend('<img id="diagram_1" src="../public/images/indMCMCP.png" alt="diagram" style="display: block; margin: -10px auto; width: 700px;">');
+        $('#diagram').attr('src', '../public/images/MCMCPG.png');
         $(".blockwise").hide();
         $(".group-level").hide();
         $(".consensus").hide();
@@ -236,6 +261,53 @@
       }
     }
   });
+
+
+
+  // Navigation logic
+  const sections = ['first-appear', 'second-appear', 'third-appear', 'forth-appear'];
+  let currentSectionIndex = 0;
+  // Initialize by showing the first section and hiding others
+  $(document).ready(function() {
+    $('#back').hide();
+    sections.forEach((section, index) => {
+      if (index !== currentSectionIndex) {
+        $(`.${section}`).hide();
+      }
+    });
+  });
+  function navigate(direction) {
+    if (direction === 'proceed' && currentSectionIndex < sections.length - 1) {
+      $(`.${sections[currentSectionIndex]}`).hide();
+      currentSectionIndex++;
+      $(`.${sections[currentSectionIndex]}`).show();
+      if (currentSectionIndex == sections.length - 1) {
+        $('#proceed').hide();
+      } else {
+        $('#proceed').show();
+      }
+      if (currentSectionIndex == 0) {
+        $('#back').hide();
+      } else {
+        $('#back').show();
+      }
+    } else if (direction === 'back' && currentSectionIndex > 0) {
+      $(`.${sections[currentSectionIndex]}`).hide();
+      currentSectionIndex--;
+      $(`.${sections[currentSectionIndex]}`).show();
+      if (currentSectionIndex == 0) {
+        $('#back').hide();
+      } else {
+        $('#back').show();
+      }
+      if (currentSectionIndex == sections.length - 1) {
+        $('#proceed').hide();
+      } else {
+        $('#proceed').show();
+      }
+    }
+  }
+
 
 
   function submitData() {

@@ -10,8 +10,8 @@ const { spawn } = require('child_process');
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1000,
-    height: 1200,
+    width: 1300,
+    height: 700,
     webPreferences: {
       preload: path.join(__dirname, 'GUI-preload.js'),
       nodeIntegration: false,
@@ -20,6 +20,7 @@ function createWindow() {
   });
 
   win.loadFile('GUI-index.html');
+  win.setPosition(30, 10);
 }
 
 // Handle data from the renderer process (GUI)
@@ -45,7 +46,7 @@ gatekeeper_means=${data.gatekeeper_means}
 gatekeeper_covs=${data.gatekeeper_covs}`;
 
   // Write to the .env file
-  const envPath = path.join(__dirname, '.env');
+  const envPath = path.join(__dirname, '..', '.env');
   fs.writeFileSync(envPath, envContent, { flag: 'w' });
   // Execute additional terminal commands if needed
   // Here we simply print a success message back to the renderer
@@ -70,7 +71,8 @@ ipcMain.on('docker', (event, data) => {
   // Example terminal command after .env update
   if (data==='build') {
     event.reply('docker-success', `Experiment is building, after seeing 'Server running on port 8080' below, you can visit "http://localhost:8080" in your local browser to test the experiment`);
-    const dockerProcess = spawn('docker', ['compose', 'up', '--build']);
+    const dockerComposeFilePath = path.join(__dirname, '..', 'docker-compose.yml');
+    const dockerProcess = spawn('docker', ['compose', '-f', dockerComposeFilePath, 'up', '--build']);
     // Listen for standard output from the Docker process
     dockerProcess.stdout.on('data', (data) => {
       event.reply('docker-output', data.toString());
@@ -103,7 +105,7 @@ ipcMain.on('download', async (event, data) => {
   try {
     if (data==='local') {
 
-      const downloadDir = path.join(__dirname, 'db_export');
+      const downloadDir = path.join(__dirname, '..', 'db_export');
       if (!fs.existsSync(downloadDir)) {
         fs.mkdirSync(downloadDir);
       }
