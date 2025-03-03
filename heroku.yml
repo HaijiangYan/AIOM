@@ -1,6 +1,6 @@
 setup:
   addons:
-    - plan: heroku-postgresql:hobby-dev
+    - plan: heroku-postgresql:essential-0
       as: DATABASE
 
 build:
@@ -10,4 +10,6 @@ build:
     NODE_ENV: production
 
 run:
-  web: node server.js
+  web: 
+    command: node server.js
+    type: basic
