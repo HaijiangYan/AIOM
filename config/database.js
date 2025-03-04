@@ -9,7 +9,7 @@ let poolConfig;
 if (isProduction) {
   // On Heroku, use the DATABASE_URL environment variable
   poolConfig = {
-    connectionString: 'postgres://udvb74arv87593:pd17a850ef3ed37a46956124e2cec257cd52f5ae89c6ea3cbb41c5c27ae5bf6ec@c3nv2ev86aje4j.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/da01nkrd86m7co',
+    connectionString: process.env.DATABASE_URL,
     ssl: { 
       rejectUnauthorized: false // Required for Heroku PostgreSQL
     }
