@@ -9,9 +9,8 @@ build:
   config:
     NODE_ENV: production
 
-environments:
-  production:
-    NODE_ENV: production  # Available at runtime
-
 run:
-  web: node server.js
+  web: 
+    command: node server.js
+    env:
+      NODE_ENV: production
