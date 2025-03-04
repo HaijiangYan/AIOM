@@ -10,7 +10,6 @@ services:
     image: haijiangyan/mcmcp-allinone:latest
     environment:
       # database 
-      - NODE_ENV=development
       - DB_USER=postgres
       - DB_PASSWORD=mcmcp
       - DB_HOST=postgres

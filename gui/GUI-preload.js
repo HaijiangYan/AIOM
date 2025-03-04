@@ -8,4 +8,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onDocker: (callback) => ipcRenderer.on('docker-success', (event, data) => callback(data)), 
   outputDocker: (callback) => ipcRenderer.on('docker-output', (event, data) => callback(data)), 
   download: (command) => ipcRenderer.send('download', command),
+
+  deploy_online: (command) => ipcRenderer.send('deploy', command),
+  onDeploy: (callback) => ipcRenderer.on('deploy', (event, data) => callback(data)),
 });

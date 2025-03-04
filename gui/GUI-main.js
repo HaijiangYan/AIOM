@@ -177,5 +177,56 @@ function exportTableToCSV(table, downloadDir) {
   });
 }
 
+ipcMain.on('deploy', (event, data) => {
+  if (data==='heroku') {
+    // Detect operating system
+    const platform = process.platform;
+    let scriptPath;
+
+    if (platform === 'win32') {
+      event.reply('deploy', 'Windows system detected');
+      scriptPath = path.join(__dirname, '..', 'heroku', 'deploy-heroku.bat');
+    } else if (platform === 'darwin') {
+      event.reply('deploy', 'macOS system detected');
+      scriptPath = path.join(__dirname, '..', 'heroku', 'deploy-heroku.sh');
+    } else if (platform === 'linux') {
+      event.reply('deploy', 'Linux system detected');
+      scriptPath = path.join(__dirname, '..', 'heroku', 'deploy-heroku.sh');
+    } else {
+      event.reply('deploy', `Unsupported platform: ${platform}`);
+      return;
+    }
+
+    const deployProcess = spawn(scriptPath, [], {
+      shell: true, // Important for .bat files
+      stdio: 'pipe'
+    });
+    // Listen for standard output from the Docker process
+    deployProcess.stdout.on('data', (data) => {
+      event.reply('deploy', data.toString());
+    });
+
+    // Listen for error output from the Docker process
+    deployProcess.stderr.on('data', (data) => {
+      event.reply('deploy', data.toString());
+    });
+
+    // Listen for the close event when the process is finished
+    deployProcess.on('close', (code) => {
+      if (code === 0) {
+        event.reply('deploy', 'Deployment completed successfully!');
+      } else {
+        event.reply('deploy', `Deployment failed with exit code ${code}`);
+      }
+    });
+
+  } else if (data==='finish') {
+    app.quit();
+  }
+  // setTimeout(() => {
+  //   app.quit();
+  // }, 1000); 
+});
+
 // { experiment, group_table_name, max_turnpoint,  
 //   trial_per_participant_per_label, trial_per_participant_per_class, classes, class_questions, dim, n_chain, mode}

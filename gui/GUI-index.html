@@ -58,8 +58,8 @@
     </div>
   </fieldset><br>
 
-  <div id="diagram_list">
-  <img id="diagram" src="../public/images/MCMCP.png" alt="diagram" style="display: block; margin: 10px auto; width: 700px; max-height: 260px;" class="first-appear">
+  <div id="diagram_list" class="first-appear">
+  <img id="diagram" src="../public/images/MCMCP.png" alt="diagram" style="display: block; margin: 10px auto; width: 700px; max-height: 260px;">
   </div>
 
   <fieldset id="stimuli" style="height:60px" class="second-appear">
@@ -130,7 +130,7 @@
     <button onclick="submitData()">Apply</button>
     <button id="docker" onclick="submitDocker()" disabled>Build locally</button>
     <button onclick="download()">Local download</button>
-    <button onclick="deploy_online()" disabled>Deploy online</button>
+    <button onclick="deploy_online('heroku')" disabled>Deploy online</button>
     <button onclick="download_online()" disabled>Online download</button>
     <button onclick="finish()" style="background-color: red;">Finish</button>
   </div>
@@ -384,6 +384,15 @@
   function download() {
     window.electronAPI.download('local');
   }
+
+  function deploy_online(platform) {
+    window.electronAPI.deploy_online(platform);
+  }
+  window.electronAPI.onDeploy((message) => {
+    $('#output').append(`${message}\n`);
+    const outputDiv = $('#output');
+    outputDiv.scrollTop(outputDiv.prop("scrollHeight"));
+  });
   </script>
 </body>
 </html>
