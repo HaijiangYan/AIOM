@@ -2,3 +2,4 @@
 node_modules/
 db_export/
 npm-debug.log
+latest.dump
