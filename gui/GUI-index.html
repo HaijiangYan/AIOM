@@ -130,7 +130,7 @@
     <button onclick="submitData()">Apply</button>
     <button id="docker" onclick="submitDocker()" disabled>Build locally</button>
     <button onclick="download()">Local download</button>
-    <button onclick="deploy_online('heroku')">Deploy online</button>
+    <button id="online" onclick="deploy_online('heroku')" disabled>Deploy online</button>
     <button onclick="download_online()" disabled>Online download</button>
     <button onclick="finish()" style="background-color: red;">Finish</button>
   </div>
@@ -360,7 +360,7 @@
     $('#output').append(`<p>${message}</p>`);
     const outputDiv = $('#output');
     outputDiv.scrollTop(outputDiv.prop("scrollHeight"));
-    $('#docker').removeAttr("disabled");
+    $('#docker, #online').removeAttr("disabled");
   });
 
   function submitDocker() {

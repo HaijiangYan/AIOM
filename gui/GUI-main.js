@@ -264,10 +264,10 @@ ipcMain.on('deploy', (event, data) => {
         let attempts = 0;
         const maxAttempts = 36;
         // Check if DATABASE_URL exists in the config
-        const { configOutput } = await execPromise('heroku config --app ' + appName, { 
+        const { stdout } = await execPromise('heroku config --app ' + appName, { 
           cwd: path.join(__dirname, '..')
         });
-        if (configOutput.includes('DATABASE_URL')) {
+        if (stdout.includes('DATABASE_URL')) {
           event.reply('deploy', 'PostgreSQL is now fully provisioned and ready to use.');
           isProvisioned = true;
         } else {
@@ -280,11 +280,11 @@ ipcMain.on('deploy', (event, data) => {
             
             try {
               // Check if DATABASE_URL exists in the config
-              const configOutput = await execPromise('heroku config --app ' + appName, { 
+              const { stdout } = await execPromise('heroku config --app ' + appName, { 
                 cwd: path.join(__dirname, '..')
               });
               
-              if (configOutput.includes('DATABASE_URL')) {
+              if (stdout.includes('DATABASE_URL')) {
                 event.reply('deploy', 'PostgreSQL is now fully provisioned and ready to use.');
                 isProvisioned = true;
                 break;
@@ -312,18 +312,36 @@ ipcMain.on('deploy', (event, data) => {
           await runCommand('git', ['commit', '-m', 'Initial commit for Heroku deployment']);
         }
         
+        // remember to perform 'heroku authorizations:create' to create a token
+        const { stdout: tokenOutput } = await execPromise('heroku auth:token', { 
+          cwd: path.join(__dirname, '..')
+        });
+        
+        // Clean any whitespace from the token
+        const herokuToken = tokenOutput.trim();
         // Add Heroku remote if needed
         try {
-          await runCommand('git', ['remote', 'get-url', 'heroku']);
+          await runCommand('git', ['remote', 'remove', 'heroku']);
         } catch (e) {
-          await runCommand('git', ['remote', 'add', 'heroku', `https://git.heroku.com/${appName}.git`]);
+          // Ignore error if remote does not exist
         }
+        const remoteUrl = `https://heroku:${herokuToken}@git.heroku.com/${appName}.git`;
+        await runCommand('git', ['remote', 'add', 'heroku', remoteUrl]);
         
         // Push to Heroku
         await runCommand('git', ['push', 'heroku', 'main:main', '--force']);
         
         event.reply('deploy', 'Deployment completed successfully!');
-        event.reply('deploy', `Your app is now available at: https://${appName}.herokuapp.com`);
+        // Get the actual app URL
+        const { stdout: appInfoOutput } = await execPromise(`heroku info --app ${appName}`, { 
+          cwd: path.join(__dirname, '..')
+        });
+        let appUrl = `https://${appName}`;
+        const webUrlMatch = appInfoOutput.match(/Web URL:\s+(https:\/\/[^\s]+)/);
+        if (webUrlMatch && webUrlMatch[1]) {
+          appUrl = webUrlMatch[1];
+        }
+        event.reply('deploy', `Your app is now available at: ${appUrl}`);
         
       } catch (error) {
         event.reply('deploy', `Error: ${error.message}`);
