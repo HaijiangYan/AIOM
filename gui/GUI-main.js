@@ -228,27 +228,18 @@ ipcMain.on('deploy', (event, data) => {
             });
             
             loginProcess.stdout.on('data', (data) => {
-              const output = data.toString();
-              event.reply('deploy', output);
-              
-              // Look for the login prompt
-              if (output.includes('Press any key to open up the browser to login')) {
-                event.reply('deploy', 'Automatically opening browser for login...');
-                // Send Enter key to trigger browser opening
-                loginProcess.stdin.write('\n');
-              }
+              event.reply('deploy', data.toString());
+              resolve();
             });
             
             loginProcess.stderr.on('data', (data) => {
-              event.reply('deploy', data.toString());
-            });
-            
-            loginProcess.on('close', (code) => {
-              if (code === 0) {
-                event.reply('deploy', 'Login successful');
-                resolve();
-              } else {
-                reject(new Error(`Login failed with code ${code}`));
+              const output = data.toString();
+              event.reply('deploy', output);
+              // Look for the login prompt
+              if (output.includes('Press') && output.includes('browser'))  {
+                event.reply('deploy', 'Automatically opening browser for login...');
+                // Send Enter key to trigger browser opening
+                loginProcess.stdin.write('\n');
               }
             });
           });
@@ -273,7 +264,9 @@ ipcMain.on('deploy', (event, data) => {
         let attempts = 0;
         const maxAttempts = 36;
         // Check if DATABASE_URL exists in the config
-        const configOutput = await runCommand('heroku', ['config', '--app', appName]);
+        const { configOutput } = await execPromise('heroku config --app ' + appName, { 
+          cwd: path.join(__dirname, '..')
+        });
         if (configOutput.includes('DATABASE_URL')) {
           event.reply('deploy', 'PostgreSQL is now fully provisioned and ready to use.');
           isProvisioned = true;
@@ -287,7 +280,9 @@ ipcMain.on('deploy', (event, data) => {
             
             try {
               // Check if DATABASE_URL exists in the config
-              const configOutput = await runCommand('heroku', ['config', '--app', appName]);
+              const configOutput = await execPromise('heroku config --app ' + appName, { 
+                cwd: path.join(__dirname, '..')
+              });
               
               if (configOutput.includes('DATABASE_URL')) {
                 event.reply('deploy', 'PostgreSQL is now fully provisioned and ready to use.');
