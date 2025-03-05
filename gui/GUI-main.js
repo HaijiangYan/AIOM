@@ -70,7 +70,7 @@ ipcMain.on('docker', (event, data) => {
 
   // Example terminal command after .env update
   if (data==='build') {
-    event.reply('docker-success', `Experiment is building, after seeing 'Server running on port 8080' below, you can visit "http://localhost:8080" in your local browser to test the experiment`);
+    event.reply('docker-success', `Experiment is building, test on "http://localhost:8080"`);
     const dockerComposeFilePath = path.join(__dirname, '..', 'docker', 'docker-compose.yml');
     const dockerProcess = spawn('docker', ['compose', '-f', dockerComposeFilePath, 'up', '--build']);
     // Listen for standard output from the Docker process
@@ -179,46 +179,161 @@ function exportTableToCSV(table, downloadDir) {
 
 ipcMain.on('deploy', (event, data) => {
   if (data==='heroku') {
+    event.reply('deploy', 'Starting Heroku deployment...');
     // Detect operating system
-    const platform = process.platform;
-    let scriptPath;
+    // const platform = process.platform;
+    // Function to run commands sequentially
+    const runCommand = async (command, args = [], options = {}) => {
+      return new Promise((resolve, reject) => {
+        event.reply('deploy', `Running: ${command} ${args.join(' ')}`);
+        
+        const process = spawn(command, args, {
+          shell: true,
+          cwd: path.join(__dirname, '..'),
+          ...options
+        });
+        
+        process.stdout.on('data', (data) => {
+          event.reply('deploy', data.toString());
+        });
+        
+        process.stderr.on('data', (data) => {
+          event.reply('deploy', data.toString());
+        });
+        
+        process.on('close', (code) => {
+          if (code === 0) {
+            resolve();
+          } else {
+            reject(new Error(`Command exited with code ${code}`));
+          }
+        });
+      });
+    };
 
-    if (platform === 'win32') {
-      event.reply('deploy', 'Windows system detected');
-      scriptPath = path.join(__dirname, '..', 'heroku', 'deploy-heroku.bat');
-    } else if (platform === 'darwin') {
-      event.reply('deploy', 'macOS system detected');
-      scriptPath = path.join(__dirname, '..', 'heroku', 'deploy-heroku.sh');
-    } else if (platform === 'linux') {
-      event.reply('deploy', 'Linux system detected');
-      scriptPath = path.join(__dirname, '..', 'heroku', 'deploy-heroku.sh');
-    } else {
-      event.reply('deploy', `Unsupported platform: ${platform}`);
-      return;
-    }
+    // Execute commands in sequence
+    (async () => {
+      try {
+        // Check if already logged in
+        try {
+          await runCommand('heroku', ['auth:whoami']);
+          event.reply('deploy', 'Already logged in to Heroku');
+        } catch (e) {
+          event.reply('deploy', 'Need to login to Heroku');
+          const loginPromise = new Promise((resolve, reject) => {
+            const loginProcess = spawn('heroku', ['login'], {
+              shell: true,
+              cwd: path.join(__dirname, '..'),
+              stdio: 'pipe' // Important to enable stdin
+            });
+            
+            loginProcess.stdout.on('data', (data) => {
+              const output = data.toString();
+              event.reply('deploy', output);
+              
+              // Look for the login prompt
+              if (output.includes('Press any key to open up the browser to login')) {
+                event.reply('deploy', 'Automatically opening browser for login...');
+                // Send Enter key to trigger browser opening
+                loginProcess.stdin.write('\n');
+              }
+            });
+            
+            loginProcess.stderr.on('data', (data) => {
+              event.reply('deploy', data.toString());
+            });
+            
+            loginProcess.on('close', (code) => {
+              if (code === 0) {
+                event.reply('deploy', 'Login successful');
+                resolve();
+              } else {
+                reject(new Error(`Login failed with code ${code}`));
+              }
+            });
+          });
+          await loginPromise;
+        }
+        
+        // Check if app exists
+        const appName = 'mcmcp';
+        try {
+          await runCommand('heroku', ['apps:info', '--app', appName]);
+          event.reply('deploy', `App ${appName} already exists`);
+        } catch (e) {
+          event.reply('deploy', `Creating app ${appName}...`);
+          await runCommand('heroku', ['apps:create', appName]);
+        }
+        
+        // Set stack to container
+        await runCommand('heroku', ['stack:set', 'container', '--app', appName]);
+        
+        // Create PostgreSQL addon if not exists
+        let isProvisioned = false;
+        let attempts = 0;
+        const maxAttempts = 36;
+        // Check if DATABASE_URL exists in the config
+        const configOutput = await runCommand('heroku', ['config', '--app', appName]);
+        if (configOutput.includes('DATABASE_URL')) {
+          event.reply('deploy', 'PostgreSQL is now fully provisioned and ready to use.');
+          isProvisioned = true;
+        } else {
+          event.reply('deploy', 'PostgreSQL not set yet)');
+          event.reply('deploy', 'Creating PostgreSQL addon...');
+          await runCommand('heroku', ['addons:create', 'heroku-postgresql:essential-0', '--app', appName]);
+          while (!isProvisioned && attempts < maxAttempts) {
+            attempts++;
+            event.reply('deploy', `Checking PostgreSQL status (attempt ${attempts}/${maxAttempts})...`);
+            
+            try {
+              // Check if DATABASE_URL exists in the config
+              const configOutput = await runCommand('heroku', ['config', '--app', appName]);
+              
+              if (configOutput.includes('DATABASE_URL')) {
+                event.reply('deploy', 'PostgreSQL is now fully provisioned and ready to use.');
+                isProvisioned = true;
+                break;
+              } else {
+                event.reply('deploy', 'PostgreSQL still provisioning');
+              }
+            } catch (error) {
+              event.reply('deploy', `Error checking status: ${error.message}`);
+            }
+            
+            // Wait 5 seconds before checking again
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+        }
+        if (!isProvisioned) {
+          event.reply('deploy', 'Warning: Timed out waiting for PostgreSQL. Continuing anyway, but deployment might not work properly.');
+        }
 
-    const deployProcess = spawn(scriptPath, [], {
-      shell: true, // Important for .bat files
-      stdio: 'pipe'
-    });
-    // Listen for standard output from the Docker process
-    deployProcess.stdout.on('data', (data) => {
-      event.reply('deploy', data.toString());
-    });
-
-    // Listen for error output from the Docker process
-    deployProcess.stderr.on('data', (data) => {
-      event.reply('deploy', data.toString());
-    });
-
-    // Listen for the close event when the process is finished
-    deployProcess.on('close', (code) => {
-      if (code === 0) {
+  
+        
+        // Initialize git if needed
+        if (!fs.existsSync(path.join(__dirname, '..', '.git'))) {
+          await runCommand('git', ['init']);
+          await runCommand('git', ['add', '.']);
+          await runCommand('git', ['commit', '-m', 'Initial commit for Heroku deployment']);
+        }
+        
+        // Add Heroku remote if needed
+        try {
+          await runCommand('git', ['remote', 'get-url', 'heroku']);
+        } catch (e) {
+          await runCommand('git', ['remote', 'add', 'heroku', `https://git.heroku.com/${appName}.git`]);
+        }
+        
+        // Push to Heroku
+        await runCommand('git', ['push', 'heroku', 'main:main', '--force']);
+        
         event.reply('deploy', 'Deployment completed successfully!');
-      } else {
-        event.reply('deploy', `Deployment failed with exit code ${code}`);
+        event.reply('deploy', `Your app is now available at: https://${appName}.herokuapp.com`);
+        
+      } catch (error) {
+        event.reply('deploy', `Error: ${error.message}`);
       }
-    });
+    })();
 
   } else if (data==='finish') {
     app.quit();
