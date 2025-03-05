@@ -127,12 +127,12 @@
 <div class="container" id="controller">
   <h2 style="text-align: center;">Controller</h2>
   <div class="button-column">
-    <button onclick="submitData()">Apply</button>
-    <button id="docker" onclick="submitDocker()" disabled>Build locally</button>
+    <button onclick="submitData()">Update</button>
+    <button id="docker" onclick="submitDocker()" disabled>Test locally</button>
     <button onclick="download()">Local download</button>
-    <button id="online" onclick="deploy_online('heroku')" disabled>Deploy online</button>
-    <button onclick="download_online()" disabled>Online download</button>
-    <button onclick="finish()" style="background-color: red;">Finish</button>
+    <button id="online" onclick="deploy_online('heroku')" disabled>Release (Heroku)</button>
+    <button onclick="download_online('heroku')">Online download</button>
+    <button onclick="finish()" style="background-color: red;">Exit</button>
   </div>
   <!-- <input type="reset" value="Reset"> -->
   <div class="content-column">
@@ -387,6 +387,9 @@
 
   function deploy_online(platform) {
     window.electronAPI.deploy_online(platform);
+  }
+  function download_online(platform) {
+    window.electronAPI.download(platform);
   }
   window.electronAPI.onDeploy((message) => {
     $('#output').append(`${message}\n`);

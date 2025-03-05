@@ -123,6 +123,14 @@ ipcMain.on('download', async (event, data) => {
       }
       
       progressUpdate('Export completed: .\\db_export\\');
+    } else if (data==='heroku') {
+      const appName = 'mcmcp';
+      const command_capture = `heroku pg:backups:capture -a ${appName}`;
+      const command_download = `heroku pg:backups:download -a ${appName} -o ./db_export/${appName}.dump`
+      const { stdout: captureOutput, stderr: captureError } = await execPromise(command_capture, { shell: true });
+      event.reply('deploy', 'Database backup captured from heroku successfully! Start downloading...');
+      const { stdout: downloadOutput, stderr: downloadError } = await execPromise(command_download, { shell: true });
+      event.reply('deploy', 'Database backup downloaded from heroku successfully!');
     }
   } catch (error) {
       progressUpdate('error');
@@ -303,8 +311,6 @@ ipcMain.on('deploy', (event, data) => {
           event.reply('deploy', 'Warning: Timed out waiting for PostgreSQL. Continuing anyway, but deployment might not work properly.');
         }
 
-  
-        
         // Initialize git if needed
         if (!fs.existsSync(path.join(__dirname, '..', '.git'))) {
           await runCommand('git', ['init']);
