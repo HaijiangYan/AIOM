@@ -124,6 +124,7 @@ ipcMain.on('download', async (event, data) => {
       
       progressUpdate('Export completed: .\\db_export\\');
     } else if (data==='heroku') {
+      event.reply('deploy', 'Start downloading...');
       const appName = 'mcmcp';
       const command_capture = `heroku pg:backups:capture -a ${appName}`;
       const command_download = `heroku pg:backups:download -a ${appName} -o ./db_export/${appName}.dump`
@@ -186,7 +187,7 @@ function exportTableToCSV(table, downloadDir) {
 }
 
 ipcMain.on('deploy', (event, data) => {
-  if (data==='heroku') {
+  if (data.platform==='heroku') {
     event.reply('deploy', 'Starting Heroku deployment...');
     // Detect operating system
     // const platform = process.platform;
@@ -255,7 +256,9 @@ ipcMain.on('deploy', (event, data) => {
         }
         
         // Check if app exists
-        const appName = 'mcmcp';
+        const appName = data.appname;
+        const dyno_type = data.dyno_type;
+        const db_plan = data.db_plan;
         try {
           await runCommand('heroku', ['apps:info', '--app', appName]);
           event.reply('deploy', `App ${appName} already exists`);
@@ -281,7 +284,7 @@ ipcMain.on('deploy', (event, data) => {
         } else {
           event.reply('deploy', 'PostgreSQL not set yet)');
           event.reply('deploy', 'Creating PostgreSQL addon...');
-          await runCommand('heroku', ['addons:create', 'heroku-postgresql:essential-0', '--app', appName]);
+          await runCommand('heroku', ['addons:create', `heroku-postgresql:${db_plan}`, '--app', appName]);
           while (!isProvisioned && attempts < maxAttempts) {
             attempts++;
             event.reply('deploy', `Checking PostgreSQL status (attempt ${attempts}/${maxAttempts})...`);
@@ -316,6 +319,11 @@ ipcMain.on('deploy', (event, data) => {
           await runCommand('git', ['init']);
           await runCommand('git', ['add', '.']);
           await runCommand('git', ['commit', '-m', 'Initial commit for Heroku deployment']);
+          event.reply('deploy', 'Initialized git repository automatically');
+        } else {
+          await runCommand('git', ['add', '.']);
+          await runCommand('git', ['commit', '-m "Default update for Heroku deployment"']);
+          event.reply('deploy', 'Updated git repository automatically');
         }
         
         // remember to perform 'heroku authorizations:create' to create a token
@@ -338,6 +346,13 @@ ipcMain.on('deploy', (event, data) => {
         await runCommand('git', ['push', 'heroku', 'main:main', '--force']);
         
         event.reply('deploy', 'Deployment completed successfully!');
+
+        // Set dyno plan
+        const { stdout: dyno_plan } = await execPromise('heroku ps:type' + dyno_type + '--app ' + appName, { 
+          cwd: path.join(__dirname, '..')
+        });
+        event.reply('deploy', dyno_plan);
+
         // Get the actual app URL
         const { stdout: appInfoOutput } = await execPromise(`heroku info --app ${appName}`, { 
           cwd: path.join(__dirname, '..')

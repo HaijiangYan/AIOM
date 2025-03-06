@@ -130,7 +130,7 @@
     <button onclick="submitData()">Update</button>
     <button id="docker" onclick="submitDocker()" disabled>Test locally</button>
     <button onclick="download()">Local download</button>
-    <button id="online" onclick="deploy_online('heroku')" disabled>Release (Heroku)</button>
+    <button id="online" onclick="setup_heroku()" disabled>Release (Heroku)</button>
     <button onclick="download_online('heroku')">Online download</button>
     <button onclick="finish()" style="background-color: red;">Exit</button>
   </div>
@@ -140,6 +140,33 @@
     <div id="output" style="white-space: pre-wrap;"></div>
   </div>
 </div>
+</div>
+
+<div id="heroku_setup">
+  <div id="herokuContent">
+      <h3>Heroku Config</h3><br>
+
+      <label>Name your app:</label>
+      <input id="appname" type="text" size="5"> <br><br>
+
+      <label>Dyno type:</label>
+      <select id="dyno">
+        <option value="eco">eco</option>
+        <option value="basic">basic</option>
+        <option value="standard-1x">standard-1x</option>
+        <option value="standard-2x">standard-2x</option>
+      </select> <br><br>
+
+      <label>Database plan:</label>
+      <select id="database_plan">
+        <option value="essential-0">essential-0</option>
+        <option value="essential-1">essential-1</option>
+      </select> <br><br>
+
+      <button id="confirm">Confirm</button>
+      <button id="cancel">Cancel</button>
+      <p id="name_length_alert">Invalid app name (length < 3)</p>
+  </div>
 </div>
 
 
@@ -385,8 +412,33 @@
     window.electronAPI.download('local');
   }
 
-  function deploy_online(platform) {
-    window.electronAPI.deploy_online(platform);
+  function setup_heroku() {
+    return $.Deferred(function(deferred) {
+        $("#heroku_setup").css("display", "flex");
+
+        // Wait for the user to click "Continue"
+        $("#confirm").on("click", function() {
+            const platform = 'heroku';
+            const appname = $('#appname').val();
+            const dyno_type = $('#dyno').val();
+            const db_plan = $('#database_plan').val();
+            if (appname.length < 3) {
+              $("#name_length_alert").css("visibility", "visible");
+            } else {
+              $("#name_length_alert").css("visibility", "hidden");
+              $("#heroku_setup").css("display", "none"); // Hide the modal
+              deferred.resolve();    // Continue the script
+              deploy_online({platform, appname, dyno_type, db_plan});
+            }
+        });
+        $("#cancel").on("click", function() {
+            $("#heroku_setup").css("display", "none"); // Hide the modal
+            deferred.resolve();
+        });
+    }).promise();
+  }
+  function deploy_online(args) {
+    window.electronAPI.deploy_online(args);
   }
   function download_online(platform) {
     window.electronAPI.download(platform);
