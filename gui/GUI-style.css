@@ -207,7 +207,7 @@ button:not(:disabled):hover {
     height: 100%; /* Ensure full height */
 }
 
-#heroku_setup {
+#heroku_setup, #heroku_download {
     display: none; /* Hidden by default */
     position: fixed;
     z-index: 1000;
@@ -221,7 +221,7 @@ button:not(:disabled):hover {
     align-items: center;
 }
 
-#herokuContent {
+#herokuContent, #heroku_download_name {
     background-color: white;
     padding: 20px;
     border-radius: 5px;

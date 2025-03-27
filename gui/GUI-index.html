@@ -131,7 +131,7 @@
     <button id="docker" onclick="submitDocker()" disabled>Test locally</button>
     <button onclick="download()">Local download</button>
     <button id="online" onclick="setup_heroku()" disabled>Release (Heroku)</button>
-    <button onclick="download_online('heroku')">Online download</button>
+    <button onclick="download_heroku()">Online download</button>
     <button onclick="finish()" style="background-color: red;">Exit</button>
   </div>
   <!-- <input type="reset" value="Reset"> -->
@@ -166,6 +166,18 @@
       <button id="confirm">Confirm</button>
       <button id="cancel">Cancel</button>
       <p id="name_length_alert">Invalid app name (length < 3)</p>
+  </div>
+</div>
+
+<div id="heroku_download">
+  <div id="heroku_download_name">
+      <h3>Heroku Download</h3><br>
+
+      <label>Name of your app:</label>
+      <input id="hrkd_appname" type="text" size="5"> <br><br>
+
+      <button id="hrkd_confirm">Download</button>
+      <button id="hrkd_cancel">Cancel</button>
   </div>
 </div>
 
@@ -409,7 +421,9 @@
   });
 
   function download() {
-    window.electronAPI.download('local');
+    const platform = 'local';
+    const appname = 'MCMCP';
+    window.electronAPI.download({platform, appname});
   }
 
   function setup_heroku() {
@@ -440,8 +454,27 @@
   function deploy_online(args) {
     window.electronAPI.deploy_online(args);
   }
-  function download_online(platform) {
-    window.electronAPI.download(platform);
+
+  function download_heroku() {
+    return $.Deferred(function(deferred) {
+        $("#heroku_download").css("display", "flex");
+
+        // Wait for the user to click "Continue"
+        $("#hrkd_confirm").on("click", function() {
+            const platform = 'heroku';
+            const appname = $('#hrkd_appname').val();
+            $("#heroku_download").css("display", "none"); // Hide the modal
+            deferred.resolve();    // Continue the script
+            download_online({platform, appname});
+        });
+        $("#hrkd_cancel").on("click", function() {
+            $("#heroku_download").css("display", "none"); // Hide the modal
+            deferred.resolve();
+        });
+    }).promise();
+  }
+  function download_online(args) {
+    window.electronAPI.download(args);
   }
   window.electronAPI.onDeploy((message) => {
     $('#output').append(`${message}\n`);

@@ -70,7 +70,7 @@ ipcMain.on('docker', (event, data) => {
 
   // Example terminal command after .env update
   if (data==='build') {
-    event.reply('docker-success', `Experiment is building, test on "http://localhost:8080"`);
+    event.reply('docker-success', 'Visit http://localhost:8080 to test');
     const dockerComposeFilePath = path.join(__dirname, '..', 'docker', 'docker-compose.yml');
     const dockerProcess = spawn('docker', ['compose', '-f', dockerComposeFilePath, 'up', '--build']);
     // Listen for standard output from the Docker process
@@ -103,7 +103,7 @@ ipcMain.on('download', async (event, data) => {
   };
 
   try {
-    if (data==='local') {
+    if (data.platform==='local') {
 
       const downloadDir = path.join(__dirname, '..', 'db_export');
       if (!fs.existsSync(downloadDir)) {
@@ -123,9 +123,9 @@ ipcMain.on('download', async (event, data) => {
       }
       
       progressUpdate('Export completed: .\\db_export\\');
-    } else if (data==='heroku') {
+    } else if (data.platform==='heroku') {
       event.reply('deploy', 'Start downloading...');
-      const appName = 'mcmcp';
+      const appName = data.appname;
       const command_capture = `heroku pg:backups:capture -a ${appName}`;
       const command_download = `heroku pg:backups:download -a ${appName} -o ./db_export/${appName}.dump`
       const { stdout: captureOutput, stderr: captureError } = await execPromise(command_capture, { shell: true });
@@ -134,7 +134,7 @@ ipcMain.on('download', async (event, data) => {
       event.reply('deploy', 'Database backup downloaded from heroku successfully!');
     }
   } catch (error) {
-      progressUpdate('error');
+      progressUpdate('error: maybe your provided appname is wrong or you are not logged in to heroku');
       // throw error;
   }
 });
@@ -348,7 +348,7 @@ ipcMain.on('deploy', (event, data) => {
         event.reply('deploy', 'Deployment completed successfully!');
 
         // Set dyno plan
-        const { stdout: dyno_plan } = await execPromise('heroku ps:type' + dyno_type + '--app ' + appName, { 
+        const { stdout: dyno_plan } = await execPromise('heroku ps:type ' + dyno_type + ' --app ' + appName, { 
           cwd: path.join(__dirname, '..')
         });
         event.reply('deploy', dyno_plan);
