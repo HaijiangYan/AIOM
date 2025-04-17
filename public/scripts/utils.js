@@ -10,18 +10,13 @@ var class_questions;
 var n_rest;
 var mode;
 var stimuli_attr;
-var stimuli_prefix;
 var current_n_class = 0; // which class we're in by order;
 var n_trial = 1;
 
 
-function consent() {
-    window.location.href = `consent`;
-}
-
 function submit_id(id) {
     Cookies.set('pid', id);
-    axios.post(`api/set_table`, {
+    axios.post(`/api/set_table`, {
         names: id,
     }, {headers: {
             'Content-Type': 'application/json',
@@ -38,7 +33,7 @@ function submit_id(id) {
         Cookies.set('n_rest', response.data.n_rest);
         Cookies.set('mode', response.data.mode);
     })
-    .then(() => {window.location.href = `instruction`;})
+    .then(() => {window.location.href = `/instruction`;})
     .catch((error) => {
         console.error('Error:', error);
         alert(`Error in setting tables`);
@@ -58,13 +53,11 @@ function startChoice() {
 
     if (mode === 'test') {
         stimuli_attr = 'alt';
-        stimuli_prefix = '';
     } else if (mode === 'image') {
         stimuli_attr = 'src';
-        stimuli_prefix = 'data:image/png;base64, ';
     }
 
-    axios.get(`api/start_choices`, {
+    axios.get(`/api/start_choices`, {
         headers: {
             'ID': local_pid,
             'current_class': classes[class_order[current_n_class]],
@@ -75,11 +68,11 @@ function startChoice() {
         $(".question").html(class_questions[class_order[current_n_class]]);
         current_on_left = 0.5 <= Math.random();
         if (current_on_left) {
-            $("#choice_left > .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.current);
-            $("#choice_right > .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.proposal);
+            $("#choice_left > .stimuli").attr(stimuli_attr, response.data.current);
+            $("#choice_right > .stimuli").attr(stimuli_attr, response.data.proposal);
         } else {
-            $("#choice_right > .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.current);
-            $("#choice_left > .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.proposal);
+            $("#choice_right > .stimuli").attr(stimuli_attr, response.data.current);
+            $("#choice_left > .stimuli").attr(stimuli_attr, response.data.proposal);
         }
         
         local_chain = response.data.table_no;
@@ -94,7 +87,7 @@ function startChoice() {
 }
 
 function getChoice() {
-    axios.get(`api/get_choices`, {
+    axios.get(`/api/get_choices`, {
         headers: {
             'ID': local_pid,
             'current_class': classes[class_order[current_n_class]],
@@ -104,11 +97,11 @@ function getChoice() {
         // console.log(response.data.proposal);
         current_on_left = 0.5 <= Math.random();
         if (current_on_left) {
-            $("#choice_left .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.current);
-            $("#choice_right .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.proposal);
+            $("#choice_left .stimuli").attr(stimuli_attr, response.data.current);
+            $("#choice_right .stimuli").attr(stimuli_attr, response.data.proposal);
         } else {
-            $("#choice_right .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.current);
-            $("#choice_left .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.proposal);
+            $("#choice_right .stimuli").attr(stimuli_attr, response.data.current);
+            $("#choice_left .stimuli").attr(stimuli_attr, response.data.proposal);
         }
 
         local_chain = response.data.table_no;
@@ -130,7 +123,7 @@ function sendChoice(selected) {
         decision = 1-selected;
     }
     // console.log("result");
-    axios.post(`api/register_choices`, {
+    axios.post(`/api/register_choices`, {
         choice: decision,
     }, 
         {headers: {
@@ -182,7 +175,7 @@ function sendChoice(selected) {
 }
 
 function endExperiment() {
-    window.location.href = `thanks`;
+    window.location.href = `/thanks`;
 }
 
 

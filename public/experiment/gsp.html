@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../images/favicon.png"/>
+    <title>Experiment in progress!</title>
+    <link rel="stylesheet" href="../css/experiment_ui.css">
+    <script type = "text/javascript" src="../scripts/utils-gsp.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div id="rest">
+            <div id="restContent">
+                <p></p>
+                <button id="continueButton">Back to the task</button>
+            </div>
+        </div>
+
+        <div class="question">Which?</div>
+        <div class="gsp-options-container" id="choices">
+            <!-- Dynamically generated options -->
+        </div>
+        <div class="slider-container">
+            <input type="range" id="slider" min="0" max="100" value="0" step="1">
+        </div>
+        <button onclick="sendChoice()">submit</button>
+    </div>
+    <div id="progressBar"></div>
+
+    <script>
+
+    // Call startChoice when the document is ready
+    $(document).ready(function () {
+        startChoice();
+        $('#slider').on('input change', updateHighlight);
+    });
+    </script>
+</body>
+</html>

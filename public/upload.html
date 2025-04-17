@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload to Dropbox</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .upload-container {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .upload-container:hover {
+            border-color: #0061ff;
+        }
+        .file-input {
+            display: none;
+        }
+        .upload-btn {
+            background-color: #0061ff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .upload-btn:hover {
+            background-color: #0050d0;
+        }
+        #preview {
+            margin-top: 20px;
+        }
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 10px;
+        }
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .preview-container {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #ff4d4f;
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            line-height: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        
+        .delete-btn:hover {
+            background-color: #ff7875;
+        }
+        
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.3/dist/heic2any.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Upload Images</h1>
+    <p>Please upload your images in JPG, JPEG, HEIC or PNG format.</p>
+    
+    <div class="upload-container">
+        <p>Drag and drop images here or</p>
+        <input type="file" id="file-input" class="file-input" accept=".jpg,.jpeg,.png,.heic" multiple>
+        <button class="upload-btn" id="select-btn">Select Files</button>
+    </div>
+    
+    <div id="preview"></div>
+    <div id="status"></div>
+    <button class="upload-btn" id="upload-btn" style="display: none;">Upload</button>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const selectBtn = document.getElementById('select-btn');
+        const uploadBtn = document.getElementById('upload-btn');
+        const preview = document.getElementById('preview');
+        const status = document.getElementById('status');
+        const uploadContainer = document.querySelector('.upload-container');
+        const selectedFiles = [];
+
+        // Open file dialog when select button is clicked
+        selectBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Handle file selection
+        fileInput.addEventListener('change', async () => {
+            await handleFiles();
+        });
+
+        // Drag and drop functionality
+        uploadContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadContainer.style.backgroundColor = '#f7f9fa';
+        });
+
+        uploadContainer.addEventListener('dragleave', () => {
+            uploadContainer.style.backgroundColor = '';
+        });
+
+        uploadContainer.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            uploadContainer.style.backgroundColor = '';
+            
+            if (e.dataTransfer.files) {
+                fileInput.files = e.dataTransfer.files;
+                await handleFiles();
+            }
+        });
+
+        async function handleFiles() {
+            const files = fileInput.files;
+            
+            if (files.length > 0) {
+                preview.innerHTML = '';
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+
+                    if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+                        status.innerHTML = 'Converting HEIC image...';
+                        
+                        // Convert HEIC to JPEG
+                        const jpegBlob = await heic2any({
+                            blob: file,
+                            toType: 'image/jpeg',
+                            quality: 0.8
+                        });
+                        
+                        // Create a new file from the converted blob
+                        file = new File([jpegBlob], file.name.replace('.heic', '.jpg'), {
+                            type: 'image/jpeg'
+                        });
+                        
+                        status.innerHTML = 'HEIC conversion complete';
+                    }
+                    
+                    // Validate file type
+                    if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
+                        status.innerHTML = 'Please upload only JPG, JPEG or PNG files.';
+                        status.style.color = 'red';
+                        continue;
+                    }
+                    
+                    selectedFiles.push(file);
+                }
+                create_preview();
+                
+                if (selectedFiles.length > 0) {
+                    status.innerHTML = `${selectedFiles.length} file(s) selected`;
+                    status.style.color = 'green';
+                    uploadBtn.style.display = 'block';
+                }
+            }
+        }
+
+        function create_preview() {
+            preview.innerHTML = '';
+            
+            selectedFiles.forEach((file, index) => {
+                // Create container for preview and delete button
+                const container = document.createElement('div');
+                container.classList.add('preview-container');
+                container.setAttribute('data-index', index);
+                
+                // Create preview image
+                const img = document.createElement('img');
+                img.classList.add('preview-image');
+                img.file = file;
+                container.appendChild(img);
+                
+                // Create delete button
+                const deleteBtn = document.createElement('div');
+                deleteBtn.classList.add('delete-btn');
+                deleteBtn.innerHTML = '×'; // × symbol
+                deleteBtn.addEventListener('click', function() {
+                    removeImage(index);
+                });
+                container.appendChild(deleteBtn);
+                
+                preview.appendChild(container);
+                
+                // Load image preview
+                const reader = new FileReader();
+                reader.onload = (function(aImg) { 
+                    return function(e) { 
+                        aImg.src = e.target.result; 
+                    }; 
+                })(img);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function removeImage(index) {
+            // Remove the file from selectedFiles array
+            selectedFiles.splice(index, 1);
+            
+            // Update the preview
+            create_preview();
+            
+            // Update status
+            if (selectedFiles.length > 0) {
+                status.innerHTML = `${selectedFiles.length} file(s) selected`;
+                status.style.color = 'green';
+                uploadBtn.style.display = 'block';
+            } else {
+                status.innerHTML = 'No files selected';
+                uploadBtn.style.display = 'none';
+            }
+        }
+
+        // Handle upload to Dropbox
+        uploadBtn.addEventListener('click', () => {
+            if (selectedFiles.length === 0) {
+                status.innerHTML = 'No files selected for upload';
+                return;
+            }
+
+            // Create FormData to send files
+            const formData = new FormData();
+            selectedFiles.forEach((file, index) => {
+                formData.append('files', file);
+            });
+
+            // Send files to backend using axios
+            axios.post('/api/upload_files', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    status.innerHTML = `Uploading: ${percentCompleted}%`;
+                }
+            })
+            .then(response => {
+                status.innerHTML = 'Files uploaded successfully!';
+                status.style.color = 'green';
+                
+                // Reset after successful upload
+                setTimeout(() => {
+                    preview.innerHTML = '';
+                    status.innerHTML = '';
+                    uploadBtn.style.display = 'none';
+                    selectedFiles.length = 0;
+                    fileInput.value = '';
+                    endExperiment();
+                }, 2000);
+            })
+            .catch(error => {
+                console.error('Upload error:', error);
+                status.innerHTML = 'Upload failed. Please try again. If It persists, please contact us.';
+                status.style.color = 'red';
+            });
+        });
+
+    function endExperiment() {
+        window.location.href = 'upload_finished';
+    }
+    </script>
+</body>
+</html></html>

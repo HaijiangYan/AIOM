@@ -9,8 +9,19 @@ function gaussianRandom(mean=0, stdDev=1) {
     return z * stdDev + mean;
 }
 
-function uniform_array(x) {
-    return Array(x).fill().map(() => Math.random()); 
+function uniform_array(x, min=0, max=1) {
+    return Array(x).fill().map(() => Math.random() * (max - min) + min);
+}
+
+// function to generate a uniform array with each item in different ranges, ranges={'0', [0, 1], '1', [0, 2]}
+function uniform_array_ranges(x, ranges) {
+    return Array(x).fill().map((_, i) => {
+        const range = ranges[Object.keys(ranges)[i]]; // Get the range for the current index 
+        const min = range[0];
+        const max = range[1];
+        return Math.random() * (max - min) + min; // Generate a random number in the range
+    }
+    );
 }
 
 function gaussian_array(mean, cov) {
@@ -58,4 +69,4 @@ function calculateMode(arrays) {
   return mode;
 }
 
-module.exports = {gaussianRandom, uniform_array, gaussian_array, shuffle, createShiftedArray, calculateMean, calculateMode};
+module.exports = {uniform_array_ranges, gaussianRandom, uniform_array, gaussian_array, shuffle, createShiftedArray, calculateMean, calculateMode};

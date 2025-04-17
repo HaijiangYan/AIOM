@@ -74,7 +74,7 @@
       <input type="checkbox" id="image" name="image" value="image" class="stimuli"/>
       <label for="image">image</label>
       <label class="imageurl">address:</label>
-      <input class="imageurl" id="imageurl_input" type="text" value="http://72.144.77.119:3000/generate" size="40">
+      <input class="imageurl" id="imageurl_input" type="text" value="http://host.docker.internal:8000" size="40">
     </div>
 
   </fieldset>
@@ -100,6 +100,11 @@
   
   <span>&#9881;</span> <label>Variance of the proposal function (isotropic Gaussian):</label>
   <input id="proposal_cov" type="text" value="1" size="5"><br><br>
+
+  <input type="checkbox" id="categorization"/>
+  <label for="categorization">Followed by a categorization task (stimuli in public/stimuli/categorization).</label><br><br>
+  <input type="checkbox" id="production"/>
+  <label for="production">Followed by a production part.</label><br><br>
   </div>
 
   <fieldset id="gatekeeper" class="forth-appear">
@@ -367,6 +372,8 @@
     const mode = $('.stimuli:checked').val()
     const proposal_cov = $('#proposal_cov').val();
     const imageurl = $('#imageurl_input').val();
+    const production = $('#production').is(':checked') ? 'true' : 'false';
+    const categorization = $('#categorization').is(':checked') ? 'true' : 'false';
 
     const gatekeeper_means = {}
     const gatekeeper_covs = {}
@@ -388,7 +395,7 @@
     // Send data to main process
     window.electronAPI.sendParameters({ experiment, group_table_name, max_turnpoint, consensus_n,  
       trial_per_participant_per_label, trial_per_participant_per_class, n_rest, gatekeeper, classes, 
-      class_questions, dim, n_chain, mode, imageurl, proposal_cov, 
+      class_questions, dim, n_chain, mode, imageurl, proposal_cov, production, categorization, 
       gatekeeper_means: JSON.stringify(gatekeeper_means), 
       gatekeeper_covs: JSON.stringify(gatekeeper_covs)});
   }

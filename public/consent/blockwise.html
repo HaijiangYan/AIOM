@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consent</title>
+    <link rel="icon" type="image/png" href="../images/favicon.png"/>
+    <link rel="stylesheet" href="../css/style.css">
+<script type = "text/javascript" src="../scripts/utils_blockwise.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+<style>
+    .container {
+        text-align: center;
+        padding: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Consent</h1>
+        <form id="nameForm">
+            <input type="text" id="nameInput" placeholder="Enter your name" required>
+            <button type="submit" id="submitButton" disabled>Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const nameInput = document.getElementById('nameInput');
+        const submitButton = document.getElementById('submitButton');
+
+        function checkInput() {
+            const inputValue = nameInput.value.trim();
+            // const containsLetter = /[a-zA-Z]/.test(inputValue);
+            submitButton.disabled = inputValue.length <= 4;
+        }
+        nameInput.addEventListener('input', checkInput);
+
+        nameForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = 'id_' + nameInput.value.trim();
+            // save the name as a local identification
+            // localStorage.setItem('clientId', name);
+            // Send the name to the backend and get the instructions
+            submit_id(name);
+        });
+    </script>
+</body>
+</html>

@@ -12,7 +12,6 @@ var n_rest;
 
 var mode;
 var stimuli_attr;
-var stimuli_prefix;
 
 var current_chain;
 var current_class;
@@ -20,13 +19,9 @@ var n_trial = 1;
 var n_turnpoint = 0;
 
 
-function consent() {
-    window.location.href = `consent`;
-}
-
 function submit_id(id) {
     Cookies.set('pid', id);
-    axios.post('api/set_table', {
+    axios.post('/api/set_table', {
         names: id,
     }, {headers: {
             'Content-Type': 'application/json',
@@ -46,7 +41,7 @@ function submit_id(id) {
         Cookies.set('n_rest', response.data.n_rest);
         Cookies.set('mode', response.data.mode);
     })
-    .then(() => {window.location.href = `instruction`;})
+    .then(() => {window.location.href = `/instruction`;})
     .catch((error) => {
         console.error('Error:', error);
         alert(`Error in setting tables`);
@@ -73,10 +68,8 @@ function load_parameters() {
 
     if (mode === 'test') {
         stimuli_attr = 'alt';
-        stimuli_prefix = '';
     } else if (mode === 'image') {
         stimuli_attr = 'src';
-        stimuli_prefix = 'data:image/png;base64, ';
     }
 }
 
@@ -84,9 +77,10 @@ function load_parameters() {
 function startChoice(the_chain=1, the_class=start_classes[0]) {
     current_chain = the_chain;
     current_class = the_class;
-    $( ".stimuli" ).replaceWith('<img class="stimuli" src="" alt="" height="96" width="60">');
+    $( ".stimuli_left" ).replaceWith('<img class="stimuli_left" src="" alt="" height="128" width="128" onclick="sendChoice(0)">');
+    $( ".stimuli_right" ).replaceWith('<img class="stimuli_right" src="" alt="" height="128" width="128" onclick="sendChoice(1)">');
     // console.log(current_chain, current_class);
-    axios.get(`api/start_choices`, {
+    axios.get(`/api/start_choices`, {
         headers: {
             'ID': local_pid,
             'current_chain': current_chain,
@@ -98,11 +92,11 @@ function startChoice(the_chain=1, the_class=start_classes[0]) {
         $(".question").html(class_questions[classes.indexOf(current_class)]);  //class_questions[classes.findIndex(current_class)]
         current_on_left = 0.5 <= Math.random();
         if (current_on_left) {
-            $("#choice_left > .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.current);
-            $("#choice_right > .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.proposal);
+            $(".stimuli_left").attr(stimuli_attr, response.data.current);
+            $(".stimuli_right").attr(stimuli_attr, response.data.proposal);
         } else {
-            $("#choice_right > .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.current);
-            $("#choice_left > .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.proposal);
+            $(".stimuli_right").attr(stimuli_attr, response.data.current);
+            $(".stimuli_left").attr(stimuli_attr, response.data.proposal);
         }
         
         fadein_option();
@@ -117,8 +111,13 @@ function startChoice(the_chain=1, the_class=start_classes[0]) {
 
 
 function startChoice_prior(stimuli) {
-    $( ".stimuli" ).replaceWith('<h2 class="stimuli">Option</h2>');
-    axios.get(`api/start_choices`, {
+    $( ".stimuli_left" ).replaceWith(
+        '<button class="stimuli_left" style="width: 128px; height: 64px; font-size: 22px; background-color: white; padding: 1px; margin: 0; color: black" onclick="sendChoice_prior(0)">Option</button>'
+    );
+    $( ".stimuli_right" ).replaceWith(
+        '<button class="stimuli_right" style="width: 128px; height: 64px; font-size: 22px; background-color: white; padding: 1px 1px; margin: 0; color: black" onclick="sendChoice_prior(1)">Option</button>'
+    );
+    axios.get(`/api/start_choices`, {
         headers: {
             'ID': local_pid,
             'current_chain': current_chain,
@@ -126,16 +125,16 @@ function startChoice_prior(stimuli) {
         },
     })
     .then(response => {
-        $(".question").html('Which can best describe the face:');
-        $(".question").append('<img id="question_stimuli" src="" alt="" height="96" width="60"></img>');
-        $("#question_stimuli").attr(stimuli_attr, stimuli_prefix+stimuli);
+        $(".question").html('Which can best describe the face:<br>');
+        $(".question").append('<img id="question_stimuli" src="" alt="" height="128" width="128"></img>');
+        $("#question_stimuli").attr(stimuli_attr, stimuli);
         current_on_left = 0.5 <= Math.random();
         if (current_on_left) {
-            $("#choice_left > .stimuli").html(response.data.current);
-            $("#choice_right > .stimuli").html(response.data.proposal);
+            $(".stimuli_left").html(response.data.current);
+            $(".stimuli_right").html(response.data.proposal);
         } else {
-            $("#choice_right > .stimuli").html(response.data.current);
-            $("#choice_left > .stimuli").html(response.data.proposal);
+            $(".stimuli_right").html(response.data.current);
+            $(".stimuli_left").html(response.data.proposal);
         }
         
         fadein_option();
@@ -151,7 +150,7 @@ function startChoice_prior(stimuli) {
 
 function getChoice(target) {
     // target should be 'likelihood' or 'prior'
-    axios.get(`api/get_choices`, {
+    axios.get(`/api/get_choices`, {
         headers: {
             'ID': local_pid,
             'current_chain': current_chain,
@@ -164,19 +163,19 @@ function getChoice(target) {
         current_on_left = 0.5 <= Math.random();
         if (target==='likelihood') {
             if (current_on_left) {
-                $("#choice_left > .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.current);
-                $("#choice_right > .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.proposal);
+                $(".stimuli_left").attr(stimuli_attr, response.data.current);
+                $(".stimuli_right").attr(stimuli_attr, response.data.proposal);
             } else {
-                $("#choice_right > .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.current);
-                $("#choice_left > .stimuli").attr(stimuli_attr, stimuli_prefix+response.data.proposal);
+                $(".stimuli_right").attr(stimuli_attr, response.data.current);
+                $(".stimuli_left").attr(stimuli_attr, response.data.proposal);
             }
         } else {
             if (current_on_left) {
-                $("#choice_left > .stimuli").html(response.data.current);
-                $("#choice_right > .stimuli").html(response.data.proposal);
+                $(".stimuli_left").html(response.data.current);
+                $(".stimuli_right").html(response.data.proposal);
             } else {
-                $("#choice_right > .stimuli").html(response.data.current);
-                $("#choice_left > .stimuli").html(response.data.proposal);
+                $(".stimuli_right").html(response.data.current);
+                $(".stimuli_left").html(response.data.proposal);
             }
         }
 
@@ -197,7 +196,7 @@ function sendChoice(selected) {
     } else {
         decision = 1-selected;
     }
-    axios.post(`api/register_choices`, {
+    axios.post(`/api/register_choices`, {
         choice: decision,
     }, 
         {headers: {
@@ -229,15 +228,6 @@ function sendChoice(selected) {
             // n_turnpoint ++;
             fadeaway_option(response.data.progress);
             n_trial = 1;
-            
-            $('#button_left, #button_right').off('click');
-            // Assign the new function with send_ok(0)
-            $('#button_left').on('click', function() {
-                sendChoice_prior(0);
-            });
-            $('#button_right').on('click', function() {
-                sendChoice_prior(1);
-            });
 
             setTimeout(() => {
                 startChoice_prior(response.data.proto_sample);  
@@ -257,7 +247,7 @@ function sendChoice_prior(selected) {
     } else {
         decision = 1-selected;
     }
-    axios.post(`api/register_choices`, {
+    axios.post(`/api/register_choices`, {
         choice: decision,
     }, 
         {headers: {
@@ -290,15 +280,6 @@ function sendChoice_prior(selected) {
             if (n_turnpoint < max_turnpoint) {
                 fadeaway_option(response.data.progress);
                 n_trial = 1;
-                
-                $('#button_left, #button_right').off('click');
-                // Assign the new function with send_ok(0)
-                $('#button_left').on('click', function() {
-                    sendChoice(0);
-                });
-                $('#button_right').on('click', function() {
-                    sendChoice(1);
-                });
 
                 setTimeout(() => {
                     startChoice(current_chain, response.data.proto_label);  
@@ -308,15 +289,7 @@ function sendChoice_prior(selected) {
                     n_turnpoint = 0;
                     n_trial = 1;
                     fadeaway_option(response.data.progress);
-                    
-                    $('#button_left, #button_right').off('click');
-                    // Assign the new function with send_ok(0)
-                    $('#button_left').on('click', function() {
-                        sendChoice(0);
-                    });
-                    $('#button_right').on('click', function() {
-                        sendChoice(1);
-                    });
+
                     setTimeout(() => {
                         startChoice(current_chain+1, start_classes[current_chain]);
                     }, 500) 
@@ -334,7 +307,7 @@ function sendChoice_prior(selected) {
 }
 
 function endExperiment() {
-    window.location.href = `thanks`;
+    window.location.href = `/thanks`;
 }
 
 

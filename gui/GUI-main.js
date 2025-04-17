@@ -43,7 +43,9 @@ imageurl=${data.imageurl}
 proposal_cov=${data.proposal_cov}
 gatekeeper=${data.gatekeeper}
 gatekeeper_means=${data.gatekeeper_means}
-gatekeeper_covs=${data.gatekeeper_covs}`;
+gatekeeper_covs=${data.gatekeeper_covs}
+categorization=${data.categorization}
+production=${data.production}`;
 
   // Write to the .env file
   const envPath = path.join(__dirname, '..', '.env');
