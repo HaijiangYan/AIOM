@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finish</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <link rel="icon" type="image/png" href="/pkg-static/images/favicon.png"/>
+    <link rel="stylesheet" href="/pkg-static/css/debrief.css">
+    <script>
+        const ENV = {
+            error: '/exp-static/error.html'
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Error</h1>
+        <p id="error-message">
+            Loading...
+        </p>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#error-message').load(ENV.error, function(response, status, xhr) {
+                if (status == "error") {
+                    $("#error-message").html("Sorry, there was an error loading the text.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

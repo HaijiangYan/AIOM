@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Preparation</title>
+    <link rel="icon" type="image/png" href="/pkg-static/images/favicon.png"/>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #0a0a0a; /* Dark background for geek style */
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #00ff00; /* Matrix green */
+            font-family: 'Courier New', monospace; /* Monospace font for geek look */
+            flex-direction: column;
+        }
+        .hint {
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ff00; /* Green glow */
+            letter-spacing: 2px;
+        }
+        
+        /* Progress slider container - geek style */
+        .progress-container {
+            width: 400px;
+            height: 20px;
+            background: #1a1a1a;
+            border: 2px solid #00ff00;
+            border-radius: 0; /* Sharp corners for terminal look */
+            position: relative;
+            margin-bottom: 20px;
+            box-shadow: 
+                inset 0 0 10px rgba(0, 255, 0, 0.2),
+                0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        
+        /* Progress bar - geek style */
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, 
+                #00ff00 0%, 
+                #00cc00 50%, 
+                #ffffff 100%);
+            border-radius: 0;
+            width: 0%;
+            transition: none;
+            position: relative;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+            animation: pulse 0.5s ease-in-out infinite alternate;
+        }
+        
+        /* Pulsing animation for the progress bar */
+        @keyframes pulse {
+            from { box-shadow: 0 0 15px rgba(0, 255, 0, 0.8); }
+            to { box-shadow: 0 0 25px rgba(0, 255, 0, 1); }
+        }
+        
+        /* Progress bar glow effect - more intense */
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: -3px;
+            width: 6px;
+            height: calc(100% + 6px);
+            background: #ffffff;
+            border-radius: 0;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 1);
+        }
+        
+        /* Loading text beneath the bar */
+        .loading-text {
+            font-size: 1.2em;
+            color: #00ff00;
+            text-shadow: 0 0 8px #00ff00;
+            letter-spacing: 1px;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Add some ASCII art style decoration */
+        .progress-container::before {
+            content: '[';
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5em;
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+        
+        .progress-container::after {
+            content: ']';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5em;
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="hint" id="hintText">Task <%= stage_id %></div>
+    
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <div class="loading-text" id="loadingText">click anywhere to start</div>
+    
+<script>
+    const hintText = document.getElementById('hintText');
+    const progressBar = document.getElementById('progressBar');
+    const loadingText = document.getElementById('loadingText');
+    const totalTime = 2.0; // Total duration for progress bar
+    
+    let start = null;
+    let loadingStarted = false;
+
+    // Easing function - starts slow, ends fast (cubic ease-in)
+    function easeIn(t) {
+        return t * t * t; // Cubic easing
+    }
+
+    function animateProgress(timestamp) {
+        if (!start) start = timestamp;
+        const elapsed = (timestamp - start) / 1000; // seconds
+        
+        // Calculate progress (0 to 1)
+        const linearProgress = elapsed / totalTime;
+        
+        // Apply easing function for non-linear progression
+        const easedProgress = easeIn(Math.min(linearProgress, 1));
+        
+        // Update progress bar
+        progressBar.style.width = `${easedProgress * 100}%`;
+
+        loadingText.textContent = "Loading...";
+
+        if (elapsed < totalTime) {
+            requestAnimationFrame(animateProgress);
+        } else {
+            progressBar.style.width = '100%';
+            
+            // Small delay to show completed state
+            setTimeout(() => {
+                const taskName = '<%= taskName %>';
+                window.location.href = `/experiment/${taskName}/get_experiment_page`;
+            }, 200);
+        }
+    }
+
+    // Add click event listener to start loading
+    document.addEventListener('click', function() {
+        if (!loadingStarted) {
+            loadingStarted = true;
+            start = null; // Reset start time
+            requestAnimationFrame(animateProgress);
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #eee8d5; /* Light blue-gray, suitable for academic context */
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+.question {
+    display: flex;
+    flex-direction: column;
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 100px;
+    color: #2d3748; /* Dark gray for readability */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.categorization-container {
+    display: flex;
+    flex-direction: column; /* Add this line to stack elements vertically */
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Optional: ensure container takes full width */
+    gap: 20px;
+}
+.options {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+.intensity-text {
+    font-size: 15px;
+    margin-top: 20px;
+}
+.intensity {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -25px;
+}
+#progressBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 15px;
+    width: 0%;
+    background-color: #8912c0; /* Green */
+    transition: width 0.5s ease;
+}
+@keyframes fadeOutUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-100px);
+    }
+}
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.fade-out {
+    animation: fadeOutUp 0.5s forwards;
+}
+.fade-in {
+    animation: fadeInDown 0.5s forwards;
+}
+@keyframes fadeOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100px); /* Move to right when fading out */
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100px); /* Start from left when fading in */
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInBlurScale {
+    from {
+        opacity: 0;
+        filter: blur(8px);
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        filter: blur(0px);
+        transform: scale(1);
+    }
+}
+
+.fade-out-horizontal {
+    animation: fadeOutRight 0.5s forwards;
+}
+
+.fade-in-horizontal {
+    animation: fadeInBlurScale 0.5s forwards;
+}
+
+#rest {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+}
+
+#restContent {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 300px;
+}
+
+#continueButton {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: 3px solid #52c41a;
+    border-radius: 4px;
+}
+
+#continueButton:hover {
+    cursor: pointer;
+    border: 3px solid #8912c0;
+}
+
+.categorization_button {
+    margin-left: 5px;
+    margin-right: 5px;
+    font-size: 15px;
+    width: 100px;
+    height: 50px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #ffffff;
+    border: 2px solid #ffffff; /* Light gray border */
+}
+.categorization_button:hover {
+    border: 2px solid #8912c0; 
+}
+.categorization_button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+.button_highlight {
+    border: 2px solid #8912c0;
+    background-color: #8912c0; /* Purple background */
+    color: white; 
+}
+
+.intensity_button {
+    margin-left: 1px;
+    margin-right: 1px;
+    font-size: 15px;
+    width: 30px;
+    height: 30px;
+    border-radius: 3px;
+    cursor: pointer;
+    background-color: #ffffff;
+    border: 2px solid #ffffff; /* Light gray border */
+}
+.intensity_button:hover {
+    border: 2px solid #8912c0; 
+}
+.intensity_button:disabled {
+    /* Styles for disabled state */
+    background-color: #505050;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#instructions {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+}
+#insContent {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;
+    min-height: 300px;
+    max-height: 90vh; 
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+#insContent p {
+    word-wrap: break-word;    
+    overflow-wrap: break-word;
+}
+#consentButton {
+    border: 3px solid #52c41a;
+    background-color: #52c41a;
+    width: 100px;
+    margin-top: 10px;
+    padding: 5px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+}
+#declineButton {
+    border: 3px solid #bfc4bc;
+    background-color: #bfc4bc;
+    color: #ff4d4f;
+    width: 150px;
+    margin-top: 10px;
+    padding: 5px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+}
+#consentButton:hover, #declineButton:hover {
+    border: 3px solid #000000;
+    cursor: pointer;
+}

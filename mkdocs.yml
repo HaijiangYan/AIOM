@@ -1,0 +1,40 @@
+site_name: AIOM Documentation
+site_description: Online Behavioral Experiments Configuration Tool
+site_author: Haijiang Yan
+site_url: https://aiom.readthedocs.io
+
+repo_name: HaijiangYan/AIOM
+repo_url: https://github.com/HaijiangYan/AIOM
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+
+nav:
+  - Home: index.md
+  - Quick Start: quick-start.md
+  - Installation: installation.md
+  - API Reference: api-reference.md
+  - Examples:
+    - Basic Experiment: examples/basic-experiment.md
+    - Advanced Features: examples/advanced-features.md
+  - Contributing: contributing.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - mkdocstrings

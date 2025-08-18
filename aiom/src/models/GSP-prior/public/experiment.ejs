@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/pkg-static/images/favicon.png"/>
+    <title>Experiment in progress!</title>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        window.taskName = '<%= taskName %>';
+    </script>
+    <link rel="stylesheet" href="/exp-static/<%= taskName %>/experiment.css">
+    <script type="text/javascript" src="/exp-static/<%= taskName %>/experiment.js"></script>
+</head>
+<body>
+    <div id="instructions">
+        <div id="insContent">
+            <h3>Instruction - sampling task</h3>
+            <p style="line-height: 1.8;"></p>
+
+            <hr style="border: 1px solid #ccc; margin-top: 100px; width: 100%;">
+            <div style="margin-top: 10px;">
+            <button id="consentButton">Proceed</button>
+            <!-- <button id="declineButton">I decline!</button> -->
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div id="rest">
+            <div id="restContent">
+                <p></p>
+                <button id="continueButton">Back to the task</button>
+            </div>
+        </div>
+
+        <div id="prior">
+            <div id="priorContent">
+                <p></p>
+                <img id="priorStimulus" src="" alt="Prior Image" height="128" width="128"></img>
+                <div id="priorText">
+                    <label>Options:</label>
+                    <div id="priorSelect">
+                        <!-- <option value="eco">eco</option> -->
+                    </div> <br><br>
+                </div>
+            </div>
+        </div>
+
+        <div class="question">Which?</div>
+        <div class="gsp-options-container" id="choices">
+            <!-- Dynamically generated options -->
+        </div>
+        <div class="slider-container">
+            <input type="range" id="slider" min="0" max="100" value="0" step="1">
+        </div>
+        <button id="submitButton" onclick="sendChoice()">submit</button>
+    </div>
+    <div id="progressBar"></div>
+
+    <script>
+        $(document).ready(function() {
+            set_up();
+            show_instruction().then(function() {
+                getChoice();
+                $('#slider').on('input change', updateHighlight);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!-- because of failures in the attention checks -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finish</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <link rel="icon" type="image/png" href="./images/favicon.png"/>
+    <link rel="stylesheet" href="/pkg-static/css/debrief.css">
+    <!-- <link rel="stylesheet" href="./css/style.css"> -->
+    <script type = "text/javascript" src="./scripts/utils.js"></script>
+    <script>
+        const ENV = {
+            early_stop: '/exp-static/early_stop.html'
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Debrief</h1>
+        <p id="early_stop">
+            Loading...
+        </p>
+        <button id="redirect_button" style="margin-top: 20px;">Complete</button>
+    </div>
+
+    <script>
+        function remove_cookie() {
+            const cookies = Cookies.get();
+            for (name in cookies) Cookies.remove(name);
+        }
+
+        function complete_redirect(status) {
+            axios.get('/api/complete_redirect', {
+                headers: {
+                    'ID': Cookies.get('pid'), 
+                    'Status': status,
+                    'study_id': Cookies.get('study_id')
+                },
+            })
+            .then(response => {
+                remove_cookie();
+                if (response.data.completionUrl) {
+                    window.location.href = response.data.completionUrl;
+                } else {
+                    alert('You can close this page now.');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending completion request:', error);
+            });
+        }
+
+        $(document).ready(function() {
+            $('#early_stop').load(ENV.early_stop, function(response, status, xhr) {
+                if (status == "error") {
+                    $("#early_stop").html("Sorry, there was an error loading the text.");
+                }
+            });
+            $('#redirect_button').on('click', function() {
+                complete_redirect('FAILED_ATTENTION_CHECK');
+            });
+            })
+    </script>
+</body>
+</html>

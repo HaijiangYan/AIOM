@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/pkg-static/images/favicon.png"/>
+    <title>Experiment in progress!</title>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        window.taskName = '<%= taskName %>';
+    </script>
+    <link rel="stylesheet" href="/exp-static/<%= taskName %>/experiment.css">
+    <script type="text/javascript" src="/exp-static/<%= taskName %>/experiment.js"></script>
+</head>
+<body>
+    <div id="instructions">
+        <div id="insContent">
+            <h3>Instruction - Categorization task</h3>
+            <p style="line-height: 1.8;"></p>
+
+            <hr style="border: 1px solid #ccc; margin-top: 100px; width: 100%;">
+            <div style="margin-top: 10px;">
+            <button id="consentButton">Proceed</button>
+            <!-- <button id="declineButton">I decline!</button> -->
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div id="rest">
+            <div id="restContent">
+                <p></p>
+                <button id="continueButton">Back to the task</button>
+            </div>
+        </div>
+
+        <div class="question">Which category best matches this image?</div>
+        <div class="categorization-container">
+            <img class="stimuli" src="" alt="" height="128" width="128">
+            <div class="options">
+                <!-- add options here -->
+            </div>
+            <p class="confidence-text" style="font-weight: bold; font-size: 22px;">Are you sure?</p>
+            <div class="confidence">
+                <!-- add confidence judgments here -->
+            </div>
+        </div>
+    </div>
+    <div id="progressBar"></div>
+
+    <script>
+        $(document).ready(function() {
+            $(document).on('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    e.preventDefault(); // Prevent default ESC behavior
+                    back2unselected();
+                }
+            });
+            set_up();
+            show_instruction().then(function() {
+                getChoice();
+            });
+        });
+    </script>
+</body>
+</html>

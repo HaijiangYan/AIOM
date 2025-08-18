@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consent</title>
+    <link rel="icon" type="image/png" href="/pkg-static/images/favicon.png"/>
+    <link rel="stylesheet" href="/pkg-static/css/consent.css">
+    <!-- <script type = "text/javascript" src="../../static/scripts/utils_blockwise.js"></script> -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script>
+        const ENV = {
+            pinfo: '/exp-static/pinfo.html', 
+            consent: '/exp-static/consent.html'
+        };
+    </script>
+</head>
+<body>
+
+    <div id="pInfo_container">
+        <div id="pInfo_Content">
+            <h1>Department of Psychology, University of Warwick<br>Participant Information Sheet</h1>
+            <p id="pInfo" style="line-height: 1.8;">Loading participant information...</p>
+            <hr style="border: 1px solid #ccc; margin-top: 20px; width: 100%;">
+            <button id="ProceedButton">Proceed</button><br>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Department of Psychology, University of Warwick<br>Consent Form</h1>
+        <p id="consent">
+            Loading consent...
+        </p>
+        <form id="nameForm">
+            <p style="line-height: 1.8; text-align: center;" class="nameInput">If you have read and agree with the points above, please submit your username (length>3, something <strong>you can remember</strong>) below, which we can use to identify your data.</p><br>
+            <input type="text" id="nameInput" class="nameInput" placeholder="Enter your preferred name" required>
+            <button type="submit" id="submitButton" disabled>I consent</button>
+        </form><br><br>
+    </div>
+
+    <script>
+
+        function show_pInfo(text_file) {
+            return $.Deferred(function(deferred) {
+                // Display the modal
+                $('#pInfo').load(text_file, function(response, status, xhr) {
+                    if (status == "error") {
+                        $("#pInfo").html("Sorry, there was an error loading the instruction.");
+                    }
+                });
+                $("#pInfo_container").css("display", "flex");
+
+                // Wait for the user to click "Continue"
+                $("#ProceedButton").on("click", function() {
+                    $("#pInfo_container").css("display", "none"); // Hide the modal
+                    deferred.resolve();    // Continue the script
+                });
+            }).promise();
+        }
+
+        function submit_id(id) {
+            Cookies.set('pid', id);
+            axios.post('/api/submit_id', {
+                names: id,
+            }, {headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(() => {window.location.href = `/introduction`;})
+            .catch((error) => {
+                console.error('Error:', error);
+                alert(`Error in setting tables`);
+            });
+        }
+
+        $(document).ready(function() {
+            show_pInfo(`${ENV.pinfo}`);
+            // console.log(Cookies.get('prolific_pid'));
+            $("#consent").load(`${ENV.consent}`, function(response, status, xhr) {
+                    if (status == "error") {
+                        $("#consent").html("Sorry, there was an error loading the participant information.");
+                    }
+                });
+                
+            const $nameInput = $("#nameInput");
+            const $submitButton = $("#submitButton");
+            const $selfinput_name = $(".nameInput");
+
+            if (Cookies.get('prolific_pid')) {
+                $submitButton.prop('disabled', false);
+                $selfinput_name.hide();
+                $submitButton.on('click', function(e) {
+                    e.preventDefault();
+                    const name = Cookies.get('prolific_pid').trim();
+                    submit_id(name);
+                });
+            } else {
+                // Check input on keyup/input events
+                $nameInput.on('input', function() {
+                    const inputValue = $(this).val().trim();
+                    $submitButton.prop('disabled', inputValue.length <= 3);
+                });
+                
+                // Handle form submission
+                $("#nameForm").on('submit', function(e) {
+                    e.preventDefault();
+                    const name = $nameInput.val().trim();
+                    submit_id(name);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

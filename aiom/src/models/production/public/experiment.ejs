@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/pkg-static/images/favicon.png"/>
+    <title>Production</title>
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.3/dist/heic2any.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script>
+        window.taskName = '<%= taskName %>';
+    </script>
+    <link rel="stylesheet" href="/exp-static/<%= taskName %>/experiment.css">
+    <script type="text/javascript" src="/exp-static/<%= taskName %>/experiment.js"></script>
+</head>
+<body>
+    <div id="instructions">
+        <div id="insContent">
+            <h3>Instruction - Production task</h3>
+            <p id="instruction" style="line-height: 1.8;"></p>
+
+            <hr style="border: 1px solid #ccc; margin-top: 100px; width: 100%;">
+            <div style="margin-top: 10px;">
+                <input type="checkbox" id="consent_face"/>
+                <label for="consent_face">I agree that the data uploaded in this page can be shown in academic publications</label> <br>
+            <button id="consentButton">Proceed</button><br>
+            <!-- <button id="declineButton">Decline and leave</button> -->
+            </div>
+        </div>
+    </div>
+
+    <h1>Upload</h1>
+    <p>Please allow your browser to use your webcam when permission is required.</p>
+    <p id="example_prompt">An example:</p>
+    <div style="text-align: center;"><img id='example_img' src='' alt="Example" style="width: 170px; height: auto;"></div>
+    <p>
+        <strong>Note: </strong> Please make sure your uploads follow the order: <br>
+        <p id="categories_order" style="text-align: center;">
+            <strong>happy &#8594; sad</strong>
+        </p><br>
+        After uploading all pictures following the categories above, you will be able to click the "confirm" button to submit.
+    </p>
+    
+    <!-- Tabs for switching between upload and webcam -->
+    <div class="tabs">
+        <div class="tab active" data-tab="upload" id="tab1">Upload</div>
+        <div class="tab" data-tab="webcam" id="tab2">Webcam (click to open)</div>
+    </div>
+    
+    <!-- Upload Tab Content -->
+    <div id="upload-tab" class="tab-content active">
+        <div class="upload-container">
+            <p>Drag and drop images here or</p>
+            <input type="file" id="file-input" class="file-input" accept=".jpg,.jpeg,.png,.heic" multiple>
+            <button class="upload-btn" id="select-btn">Select Files</button>
+        </div>
+    </div>
+    
+    <!-- Webcam Tab Content -->
+    <div id="webcam-tab" class="tab-content">
+        <div class="webcam-container">
+            <video id="webcam" autoplay playsinline></video>
+            <p id="category_instruction" style="font-size: 28px; color:rgb(94, 2, 181)">Take a photo for </p>
+            <div class="webcam-controls">
+                <button class="capture-btn" id="capture-btn">Take Photo</button>
+                <button class="upload-btn" id="switch-camera-btn">Switch Camera</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="preview"></div>
+    <div id="status"></div>
+    <button class="upload-btn" id="upload-btn" style="display: none;">Confirm</button>
+
+    <script>
+        $(document).ready(function() {
+            set_up();
+            show_instruction().then(function() {
+                // Initialize the webcam and upload functionality
+                if (production_mode === 'upload') {
+                    $('#tab2').hide();
+                    $('#example_prompt').html('An example of the images you should upload:');
+                } else if (production_mode === 'webcam') {
+                    $('#tab1, #upload-tab').hide();
+                    $('#example_prompt').html('<strong>Note: </strong>Please make sure the photo is taken from the front, with clear focus and good lighting. For example:');
+                }
+                $('#example_img').attr('src', example_image);
+                const categories_order = '<strong>'+local_categories.join(' &#8594; ')+'</strong>';
+                $('#categories_order').html(categories_order);
+            });
+            load_onclick();
+        });
+    </script>
+</body>
+</html>

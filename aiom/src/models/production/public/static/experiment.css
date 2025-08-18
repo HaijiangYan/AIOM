@@ -1,0 +1,202 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    line-height: 1.6;
+}
+.upload-container {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+.upload-container:hover {
+    border-color: #0061ff;
+}
+.file-input {
+    display: none;
+}
+.upload-btn {
+    background-color: #0061ff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px;
+}
+.upload-btn:hover {
+    background-color: #0050d0;
+    cursor: pointer;
+}
+.upload-btn:disabled {
+    background-color: #7b7a7a;
+    cursor: not-allowed;
+}
+#preview {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+.preview-image {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+#status {
+    margin-top: 20px;
+    font-weight: bold;
+}
+.preview-container {
+    position: relative;
+    display: inline-block;
+    margin: 10px;
+}
+
+.delete-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #ff4d4f;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+.delete-btn:hover {
+    background-color: #ff7875;
+    cursor: pointer;
+}
+
+/* Webcam container styles */
+.webcam-container {
+    margin: 20px 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+}
+
+#webcam {
+    /* width: 100%; */
+    max-width: 640px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.webcam-controls {
+    margin-top: -10px;
+    display: flex;
+    gap: 10px;
+}
+
+.capture-btn {
+    background-color: #52c41a;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px;
+}
+
+.capture-btn:hover {
+    background-color: #49ad17;
+    cursor: pointer;
+}
+
+/* Tab styles for switching between upload and webcam */
+.tabs {
+    display: flex;
+    margin: 20px 0;
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    margin-right: 5px;
+    border-radius: 5px 5px 0 0;
+}
+
+.tab.active {
+    background-color: #0061ff;
+    color: white;
+    border-color: #0061ff;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+#instructions {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+}
+#insContent {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;
+    min-height: 300px;
+    max-height: 90vh; 
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+#insContent p {
+    word-wrap: break-word;    
+    overflow-wrap: break-word;
+}
+#consentButton {
+    border: 3px solid #52c41a;
+    background-color: #52c41a;
+    width: 120px;
+    margin-top: 10px;
+    padding: 5px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+}
+#declineButton {
+    border: 3px solid #bfc4bc;
+    background-color: #bfc4bc;
+    color: #ff4d4f;
+    width: 200px;
+    margin-top: 10px;
+    padding: 5px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+}
+#consentButton:hover, #declineButton:hover {
+    border: 3px solid #000000;
+    cursor: pointer;
+}

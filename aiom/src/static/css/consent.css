@@ -1,0 +1,112 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+button:disabled {
+    background-color: #ccc; /* Example style for disabled button */
+    cursor: not-allowed;
+}
+button:hover {
+    background-color: #0056b3;
+    cursor: pointer;
+}
+#response {
+    margin-top: 20px;
+    font-weight: bold;
+}
+h1 {
+    color: #333;
+}
+form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+input[type="text"] {
+    width: 200px;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.container {
+    text-align: center;
+    width: 80%;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-height: 90vh; 
+    overflow-y: auto;
+}
+p {
+    font-size: medium;
+    line-height: 1.8;
+    text-align: left;
+}
+#pInfo_container {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+}
+#pInfo_Content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;
+    min-height: 300px;
+    max-height: 90vh; 
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+#pInfo {
+    word-wrap: break-word;    
+    overflow-wrap: break-word;
+}
+/* #ProceedButton {
+    border: none;
+    background-color: #52c41a;
+    width: 120px;
+    margin-top: 10px;
+    padding: 5px 20px;
+    font-size: 16px;
+}
+#ProceedButton:hover {
+    background-color: #0056b3;
+    cursor: pointer;
+} */

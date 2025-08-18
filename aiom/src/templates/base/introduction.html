@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+    <link rel="icon" type="image/png" href="/pkg-static/images/favicon.png"/>
+    <link rel="stylesheet" href="/pkg-static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <style>
+        .container {
+            text-align: center;
+            width: 80%;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-height: 90vh; 
+            overflow-y: auto;
+        }
+        p {
+            font-size: medium;
+            line-height: 1.8;
+            text-align: left;
+        }
+    </style>
+    <script>
+        const ENV = {
+            introduction_text: '/exp-static/introduction.html'
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Introduction</h1>
+        <p id="introduction">
+            Loading introduction...
+        </p><br>
+        <button onclick="beginExperiment()">Begin</button>
+        <div id="response"></div>
+    </div>
+
+<script>
+    function beginExperiment() {
+        if (Cookies.get('team_id')) {
+            window.location.href = 'waitingroom'; 
+        } else {
+            window.location.href = '/experiment/begin'; 
+        }
+    }
+    $(document).ready(function() {
+        $("#introduction").load(`${ENV.introduction_text}`, function(response, status, xhr) {
+            if (status == "error") {
+                $("#introduction").html("Sorry, there was an error loading the instruction.");
+            }
+        });
+    });
+</script>
+</body>
+</html>

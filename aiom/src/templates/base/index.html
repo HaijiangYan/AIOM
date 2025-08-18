@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome!</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <link rel="icon" type="image/png" href="/pkg-static/images/favicon.png"/>
+    <style>
+        .container {
+            text-align: center;
+            width: 80%;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-height: 90vh; 
+            overflow-y: auto;
+        }
+        p {
+            font-size: medium;
+            line-height: 1.8;
+            text-align: left;
+        }
+    </style>
+    <link rel="stylesheet" href="/pkg-static/css/style.css">
+    <script>
+        const ENV = {
+            index_text: '/exp-static/index.html'
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div id="welcome_content">
+        <h1>Welcome to our experiment!</h1>
+        <p>Loading...</p>
+        </div>
+        <button onclick="consent()">Begin</button>
+        <div id="response"></div>
+    </div>
+
+    <script>
+        function consent() {
+            window.location.href = 'consent';
+        }
+
+        function clearAllCookies() {
+            Object.keys(Cookies.get()).forEach(function(cookieName) {
+                Cookies.remove(cookieName);
+            });
+        }
+
+        function initializeExperiment() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const prolificPid = urlParams.get('PROLIFIC_PID');
+            const studyId = urlParams.get('STUDY_ID'); 
+            const sessionId = urlParams.get('SESSION_ID');
+            
+            if (prolificPid) Cookies.set('prolific_pid', prolificPid);
+            if (studyId) Cookies.set('study_id', studyId);
+            if (sessionId) Cookies.set('session_id', sessionId);
+        }
+
+        $(document).ready(function() {
+            clearAllCookies(); // Clear all cookies on page load
+            $('#welcome_content').load(`${ENV.index_text}`, function(response, status, xhr) {
+                if (status == "error") {
+                    $(".welcome_content").html("Sorry, there was an error loading the information.");
+                }
+            });
+
+            initializeExperiment();
+        });
+    </script>
+</body>
+</html>

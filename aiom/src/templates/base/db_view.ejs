@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Table Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0; /* Remove body margins */
+            background-color: #f4f4f4;
+            color: #333;
+            height: 100vh; /* Ensure full height */
+            overflow: hidden; /* Prevent overall scrolling */
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            padding: 20px 0;
+            background-color: #fff;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 80px); /* Adjust height for header */
+        }
+        .table-navigator {
+            width: 250px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-right: none;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto; /* Enable vertical scrolling */
+            height: 100%;
+            position: sticky; /* Fix the navigator */
+            top: 0;
+        }
+        .table-navigator h2 {
+            font-size: 1.2em;
+            margin-top: 0;
+            color: #0056b3;
+        }
+        .table-navigator ul {
+            list-style: none;
+            padding: 0;
+        }
+        .table-navigator a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #007bff;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .table-navigator a:hover {
+            background-color: #e9ecef;
+        }
+        .table-container {
+            flex: 1;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto; /* Enable vertical scrolling */
+            height: 100%;
+            padding: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+            color: #0056b3;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .no-data {
+            padding: 20px;
+            text-align: center;
+            color: #777;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Database Table Viewer</h1>
+    <div class="container">
+        <div class="table-navigator">
+            <h2>Tables</h2>
+            <ul>
+                <% tables.forEach(table => { %>
+                    <li><a onclick="showTable('<%= table %>')"><%= table %></a></li>
+                <% }); %>
+            </ul>
+        </div>
+        <div class="table-container">
+            <% tables.forEach(table => { %>
+                <div id="<%= table %>" class="table-content hidden">
+                    <h2><%= table %></h2>
+                    <% if (tableContents[table].length > 0) { %>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <% Object.keys(tableContents[table][0]).forEach(col => { %>
+                                        <th><%= col %></th>
+                                    <% }); %>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% tableContents[table].forEach(row => { %>
+                                    <tr>
+                                        <% Object.values(row).forEach(val => { %>
+                                            <td><%= val === null ? '' : JSON.stringify(val) %></td>
+                                        <% }); %>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    <% } else { %>
+                        <p class="no-data">No data available in this table.</p>
+                    <% } %>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+
+    <script>
+        function showTable(tableId) {
+            // Hide all table contents
+            const tableContents = document.querySelectorAll('.table-content');
+            tableContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Show the selected table content
+            const selectedTable = document.getElementById(tableId);
+            if (selectedTable) {
+                selectedTable.classList.remove('hidden');
+            }
+        }
+
+        // Show the first table by default
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstTableLink = document.querySelector('.table-navigator a');
+            if (firstTableLink) {
+                firstTableLink.click();
+            }
+        });
+    </script>
+</body>
+</html>
