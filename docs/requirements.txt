@@ -1,5 +1,13 @@
+# Core MkDocs
 mkdocs>=1.4.0
-mkdocs-material>=8.0.0
-mkdocstrings>=0.19.0
-mkdocstrings-python>=0.8.0
-pymdown-extensions>=9.0.0
+mkdocs-material>=9.0.0
+
+# Extensions and plugins
+pymdown-extensions>=10.0.0
+mkdocs-minify-plugin>=0.6.0
+mkdocs-git-revision-date-localized-plugin>=1.2.0
+mkdocs-awesome-pages-plugin>=2.8.0
+
+# Optional but useful plugins
+mkdocs-macros-plugin>=0.7.0
+mkdocs-include-markdown-plugin>=4.0.0
