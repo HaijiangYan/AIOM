@@ -113,6 +113,7 @@ Your PostgreSQL database is now running and accessible at (need to be aligned wi
 - **Database**: aiom
 - **Username**: postgres
 - **Password**: aiom
+
 ```bash
 # some useful command for docker
 

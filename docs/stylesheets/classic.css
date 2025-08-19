@@ -1,4 +1,4 @@
-/* Classic ReadTheDocs theme - Fix double border code blocks */
+/* Clean CSS that doesn't interfere with ReadTheDocs code blocks */
 
 /* Table styling improvements */
 table {
@@ -68,6 +68,11 @@ h1, h2, h3, h4, h5, h6 {
     background: #fef6f6 !important;
 }
 
+/* Navigation improvements */
+.wy-menu-vertical li.toctree-l1 > a {
+    font-weight: bold !important;
+}
+
 /* Responsive improvements */
 @media (max-width: 768px) {
     table {
@@ -83,13 +88,19 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-/* Navigation improvements */
-.wy-menu-vertical li.toctree-l1 > a {
-    font-weight: bold !important;
+/* Only improve inline code (not code blocks) */
+p code, 
+li code, 
+td code {
+    background-color: #f8f8f8 !important;
+    padding: 1px 3px !important;
+    border-radius: 2px !important;
+    font-size: 0.9em !important;
 }
 
-/* Directory tree specific styling */
-.rst-content pre {
-    white-space: pre !important;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace !important;
+/* Slightly improve code block readability without changing structure */
+.highlight, 
+.codehilite {
+    font-size: 0.9em !important;
+    line-height: 1.4 !important;
 }
