@@ -6,8 +6,8 @@ site_url: https://aiom.readthedocs.io
 repo_name: HaijiangYan/AIOM
 repo_url: https://github.com/HaijiangYan/AIOM
 
-theme:
-  name: readthedocs
+theme: 
+  name: mkdocs
   highlightjs: true
   hljs_languages:
     - javascript
@@ -15,10 +15,8 @@ theme:
     - bash
     - json
     - yaml
+    - sql
   navigation_depth: 3
-  include_homepage_in_sidebar: true
-  prev_next_buttons_location: bottom
-  collapse_navigation: false
 
 nav:
   - Home: index.md
@@ -47,31 +45,17 @@ markdown_extensions:
   - attr_list
   - def_list
   - footnotes
-  - md_in_html
+  - tables
   - toc:
       permalink: true
-      title: "Table of Contents"
-  - tables
   - fenced_code
   - codehilite:
-      guess_lang: false
       use_pygments: true
+      guess_lang: false
   - sane_lists
-  - smarty
-  - wikilinks
 
 plugins:
-  - search:
-      lang: en
-      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - search
 
-extra:
-  author: Haijiang Yan
-  project: AIOM
-  version: 1.0.0
-  github_url: https://github.com/HaijiangYan/AIOM
-  npm_url: https://www.npmjs.com/package/aiom
-
-# Custom CSS for classic ReadTheDocs styling
 extra_css:
-  - stylesheets/classic.css
+  - stylesheets/custom.css
