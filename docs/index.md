@@ -31,9 +31,10 @@ npx aiom create  # build new study
 ```
 
 You will be prompted to input some key information to define your new study, including: 
- - **`your_study_name`** - can be any name but no space.
- - **`tasks_in_order`** - can be any task names splitted by '/' in order according to your design. If a task name is already existed in [demos](demos.md), then corresponding templates will be used for this task; if not, AIOM will initialize a simple template (categorization task) as base code for you to customize your task. For the first-time test, I encourage you to input _categorization/your_customized_name_ to test the multi-task management, established demo and task custimization with AIOM in one run, without the need to build external endpoints serving your stimuli.
- - **`participants_entrance`** - for now, just using prolific (automatically get participant_id from url) or not (participants input id manually). 
+
+- **`your_study_name`** - can be any name but no space.
+- **`tasks_in_order`** - can be any task names splitted by '/' in order according to your design. If a task name is already existed in [demos](demos.md), then corresponding templates will be used for this task; if not, AIOM will initialize a simple template (categorization task) as base code for you to customize your task. For the first-time test, I encourage you to input _categorization/your_customized_name_ to test the multi-task management, established demo and task custimization with AIOM in one run, without the need to build external endpoints serving your stimuli.
+- **`participants_entrance`** - for now, just using prolific (automatically get participant_id from url) or not (participants input id manually). 
 ```bash
 cd your_study_name  # set your study as CWD
 npm install  # build dependencies
@@ -136,6 +137,13 @@ You will see
 🌐 Test your task: http://localhost:3000
 🔎 View task data: http://localhost:3000/admin/db
 ```
+
+To deploy the study online (on heroku) after debugging: 
+```bash
+npx aiom heroku deploy
+```
+
+You will be asked to provide API key for prolific if you configure it to recruit from prolific, and need to set up a heroku account and install heroku's CLI tool in advance.
 
 **Explore it and Enjoy!**
 
