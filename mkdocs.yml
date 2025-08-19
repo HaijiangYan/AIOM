@@ -43,22 +43,10 @@ nav:
 
 markdown_extensions:
   - abbr
-  - admonition
-  - attr_list
-  - def_list
-  - footnotes
-  - md_in_html
   - toc:
       permalink: true
-      title: "Table of Contents"
   - tables
   - fenced_code
-  - codehilite:
-      guess_lang: false
-      use_pygments: true
-  - sane_lists
-  - smarty
-  - wikilinks
 
 plugins:
   - search:
