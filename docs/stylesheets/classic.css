@@ -87,20 +87,3 @@ h1, h2, h3, h4, h5, h6 {
         padding-left: 20px !important;
     }
 }
-
-/* Only improve inline code (not code blocks) */
-p code, 
-li code, 
-td code {
-    background-color: #f8f8f8 !important;
-    padding: 1px 3px !important;
-    border-radius: 2px !important;
-    font-size: 0.9em !important;
-}
-
-/* Slightly improve code block readability without changing structure */
-.highlight, 
-.codehilite {
-    font-size: 0.9em !important;
-    line-height: 1.4 !important;
-}
