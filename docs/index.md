@@ -108,6 +108,7 @@ docker ps
 ```
 
 Your PostgreSQL database is now running and accessible at (need to be aligned with .env):
+
 - **Host**: localhost
 - **Port**: 5432
 - **Database**: aiom
