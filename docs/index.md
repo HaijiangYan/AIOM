@@ -126,8 +126,10 @@ After all, give it a go
 npx aiom run
 ```
 You will see 
+```
 🌐 Test your task: http://localhost:3000
 🔎 View task data: http://localhost:3000/admin/db
+```
 
 **Explore it and Enjoy!**
 

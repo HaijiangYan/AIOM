@@ -110,3 +110,88 @@ th {
         padding: 6px 8px;
     }
 }
+
+/* Fix code block rendering */
+.codehilite {
+    background: #f8f8f8;
+    border: 1px solid #e1e4e5;
+    border-radius: 4px;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+}
+
+.codehilite pre {
+    margin: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+/* Fix inline code */
+code {
+    background-color: #f1f2f3;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.85em;
+}
+
+/* Fix pre blocks */
+pre {
+    background: #f8f8f8;
+    border: 1px solid #e1e4e5;
+    border-radius: 4px;
+    padding: 12px;
+    overflow-x: auto;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+/* Fix list spacing */
+ul, ol {
+    margin: 12px 0;
+    padding-left: 30px;
+}
+
+li {
+    margin: 4px 0;
+}
+
+/* Fix bold text in lists */
+li strong {
+    font-weight: bold;
+}
+
+/* Fix heading spacing */
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    line-height: 1.25;
+}
+
+/* Fix table styling */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 15px 0;
+    border: 1px solid #e1e4e5;
+}
+
+th, td {
+    border: 1px solid #e1e4e5;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f1f2f3;
+    font-weight: bold;
+}
+
+/* Fix directory tree display */
+.rst-content pre {
+    white-space: pre;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
