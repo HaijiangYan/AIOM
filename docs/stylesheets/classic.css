@@ -1,0 +1,112 @@
+/* Classic ReadTheDocs enhancements */
+
+/* Improve code block styling */
+.codehilite {
+    background: #f8f8f8;
+    border: 1px solid #e1e4e5;
+    border-radius: 4px;
+    padding: 12px;
+    margin: 12px 0;
+}
+
+/* Add copy button styling for code blocks */
+.codehilite:hover::after {
+    content: "Copy";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #2980b9;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* Improve admonition styling */
+.admonition {
+    margin: 15px 0;
+    padding: 15px;
+    border-left: 5px solid #2980b9;
+    background: #f8f9fa;
+    border-radius: 0 4px 4px 0;
+}
+
+.admonition.note {
+    border-left-color: #2980b9;
+}
+
+.admonition.warning {
+    border-left-color: #e67e22;
+    background: #fef9f3;
+}
+
+.admonition.tip {
+    border-left-color: #27ae60;
+    background: #f8fffe;
+}
+
+.admonition.danger {
+    border-left-color: #e74c3c;
+    background: #fef6f6;
+}
+
+/* Improve table styling */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 15px 0;
+}
+
+th, td {
+    border: 1px solid #e1e4e5;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f1f2f3;
+    font-weight: bold;
+}
+
+/* Add some spacing improvements */
+.rst-content .section > h1,
+.rst-content .section > h2,
+.rst-content .section > h3,
+.rst-content .section > h4,
+.rst-content .section > h5,
+.rst-content .section > h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+}
+
+/* Improve navigation styling */
+.wy-menu-vertical li.toctree-l1 > a {
+    font-weight: bold;
+}
+
+/* Add GitHub and NPM links styling */
+.rst-footer-buttons::after {
+    content: "";
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e1e4e5;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .codehilite {
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    table {
+        font-size: 14px;
+    }
+    
+    th, td {
+        padding: 6px 8px;
+    }
+}

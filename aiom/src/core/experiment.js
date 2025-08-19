@@ -23,7 +23,6 @@ class Experiment {
             await this.setupExperimentRoutes();
             this.setupOrderedExp();
         })();
-        this.setupAdminRoute();
     }
 
     paint_AIOM_in_CLI() {
@@ -176,6 +175,8 @@ class Experiment {
                     ? `🌐 Server: http://localhost:${port}/?PROLIFIC_PID=test${Math.floor(Math.random() * 10000)}&STUDY_ID=test${Math.floor(Math.random() * 10000)}&SESSION_ID=test${Math.floor(Math.random() * 10000)}`
                     : `🌐 Server: http://localhost:${port}`;
                 console.log(test_url);
+                // Setup admin route for local database management
+                this.setupAdminRoute();
                 console.log(`🔎 View local database: http://localhost:${port}/admin/db`);
             }
         });

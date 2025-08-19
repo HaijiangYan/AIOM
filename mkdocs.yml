@@ -1,5 +1,5 @@
 site_name: AIOM Documentation
-site_description: AI Operations Manager - A comprehensive Node.js package for AI operations management
+site_description: AIOM - A comprehensive Node.js package for customizing, deploying and managing online behavioral experiments
 site_author: Haijiang Yan
 site_url: https://aiom.readthedocs.io
 
@@ -7,33 +7,18 @@ repo_name: HaijiangYan/AIOM
 repo_url: https://github.com/HaijiangYan/AIOM
 
 theme:
-  name: material
-  palette:
-    - scheme: default
-      primary: indigo
-      accent: indigo
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    - scheme: slate
-      primary: indigo
-      accent: indigo
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
-  features:
-    - navigation.tabs
-    - navigation.sections
-    - navigation.expand
-    - navigation.top
-    - navigation.tracking
-    - search.highlight
-    - search.share
-    - toc.integrate
-    - content.code.annotate
-    - content.code.copy
-  icon:
-    repo: fontawesome/brands/github
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - javascript
+    - typescript
+    - bash
+    - json
+    - yaml
+  navigation_depth: 3
+  include_homepage_in_sidebar: true
+  prev_next_buttons_location: bottom
+  collapse_navigation: false
 
 nav:
   - Home: index.md
@@ -65,49 +50,28 @@ markdown_extensions:
   - md_in_html
   - toc:
       permalink: true
-      title: On this page
-  - pymdownx.arithmatex:
-      generic: true
-  - pymdownx.betterem:
-      smart_enable: all
-  - pymdownx.caret
-  - pymdownx.details
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.inlinehilite
-  - pymdownx.keys
-  - pymdownx.mark
-  - pymdownx.smartsymbols
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.tasklist:
-      custom_checkbox: true
-  - pymdownx.tilde
+      title: "Table of Contents"
+  - tables
+  - fenced_code
+  - codehilite:
+      guess_lang: false
+      use_pygments: true
+  - sane_lists
+  - smarty
+  - wikilinks
 
 plugins:
   - search:
+      lang: en
       separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
-  - minify:
-      minify_html: true
 
 extra:
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/HaijiangYan/AIOM
-    - icon: fontawesome/brands/npm
-      link: https://www.npmjs.com/package/aiom
-  version:
-    provider: mike
+  author: Haijiang Yan
+  project: AIOM
+  version: 1.0.0
+  github_url: https://github.com/HaijiangYan/AIOM
+  npm_url: https://www.npmjs.com/package/aiom
 
+# Custom CSS for classic ReadTheDocs styling
 extra_css:
-  - stylesheets/extra.css
-
-extra_javascript:
-  - javascripts/mathjax.js
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - stylesheets/classic.css
