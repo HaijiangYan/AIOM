@@ -4,348 +4,143 @@ This guide will help you create and deploy your first experiment with AIOM in ju
 
 ## Prerequisites
 
-- AIOM installed globally (`npm install -g aiom`)
-- Basic knowledge of JavaScript (optional but helpful)
-- A text editor or IDE
-
-## Step 1: Create Your First Experiment
-
-### Initialize a New Project
+Firstly, make sure you have [node>=16](https://nodejs.org/en/download/prebuilt-installer) installed:
 
 ```bash
-aiom init my-first-experiment
-cd my-first-experiment
+node -v
+# or
+nvm list  # if you have nvm installed on your machine
 ```
 
-This creates the following project structure:
-```
-my-first-experiment/
-├── aiom.config.js          # Project configuration
-├── experiment/             # Experiment files
-│   ├── index.html         # Main experiment page
-│   ├── experiment.js      # Experiment logic
-│   └── styles.css         # Custom styles
-├── data/                  # Data storage
-├── assets/               # Images, videos, audio
-└── package.json          # Node.js project file
-```
+Setup a postgresql database for local test with [Docker](https://docs.docker.com/get-started/get-docker/) (highly recommended)
+After installing and starting the docker, in your CLI (terminal or Windows powershell)
+```bash
+docker -v  # check if docker runs correctly
+docker pull postgres:17.6-alpine  # get a psql image from docker hub, you can also choose another version of psql
 
-### Basic Experiment Structure
-
-AIOM generates a simple reaction time experiment. Let's examine the key files:
-
-**experiment/experiment.js:**
-```javascript
-const { ExperimentBuilder, Timeline } = require('aiom');
-
-const experiment = new ExperimentBuilder()
-  .setInfo({
-    title: 'Simple Reaction Time',
-    description: 'Press SPACE when you see a red circle',
-    version: '1.0.0'
-  })
-  .setTimeline([
-    {
-      type: 'html-keyboard-response',
-      stimulus: '<h2>Welcome to the experiment!</h2><p>Press SPACE to continue.</p>',
-      choices: [' ']
-    },
-    {
-      type: 'html-keyboard-response',
-      stimulus: '<div class="red-circle"></div>',
-      choices: [' '],
-      data: { task: 'reaction-time' }
-    },
-    {
-      type: 'html-keyboard-response',
-      stimulus: '<h2>Thank you!</h2><p>The experiment is complete.</p>',
-      choices: ['NO_KEYS'],
-      trial_duration: 2000
-    }
-  ])
-  .build();
-
-module.exports = experiment;
+# Start PostgreSQL container with AIOM configuration
+docker run -d \
+  --name aiom-postgres \
+  -p 5432:5432 \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=aiom \
+  -e POSTGRES_DB=aiom \
+  postgres:17.6-alpine
+# Verify the container is running
+docker ps
 ```
 
-## Step 2: Test Locally
+Your PostgreSQL database is now running and accessible at (need to be aligned with .env):
 
-Start the development server:
+- **Host**: localhost
+- **Port**: 5432
+- **Database**: aiom
+- **Username**: postgres
+- **Password**: aiom
 
 ```bash
-aiom serve
+# some useful command for docker
+
+docker exec -it aiom-postgres psql -U postgres -d aiom -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"  # Delete all data from the database
+docker stop aiom-postgres  # Stop the database
+docker start aiom-postgres  # Start the database (after stopping)
+docker exec -it aiom-postgres psql -U postgres -d aiom  # Connect to PostgreSQL CLI
+docker logs aiom-postgres  # View database logs
+docker rm -f aiom-postgres  # Remove the container (when done testing)
 ```
 
-This starts a local server at `http://localhost:3000`. Open your browser and test the experiment.
+## Creating a Simple study
 
-### Development Features
-
-- **Hot Reload**: Changes automatically refresh the browser
-- **Debug Mode**: Console logging for troubleshooting
-- **Data Preview**: View collected data in real-time
+Get your first experiment running in minutes:
 
 ```bash
-# Enable debug mode
-aiom serve --debug
-
-# Use custom port
-aiom serve --port 8080
-
-# Enable HTTPS for testing
-aiom serve --ssl
+npx aiom help  # see basic usage. This line grabs the newest version of aiom temporally
+npx aiom create  # build new study
 ```
 
-## Step 3: Customize Your Experiment
+You will be prompted to input some key information to define your new study, including: 
 
-### Add Instructions
-
-Edit `experiment/experiment.js` to add detailed instructions:
-
-```javascript
-const instructions = {
-  type: 'html-keyboard-response',
-  stimulus: `
-    <div class="instructions">
-      <h2>Instructions</h2>
-      <p>In this experiment, you will see a red circle appear on the screen.</p>
-      <p>Your task is to press the <strong>SPACEBAR</strong> as quickly as possible when you see it.</p>
-      <p>Press SPACE to begin the practice round.</p>
-    </div>
-  `,
-  choices: [' ']
-};
-```
-
-### Add Multiple Trials
-
-Create repeated trials with randomization:
-
-```javascript
-const createTrials = () => {
-  const delays = [500, 1000, 1500, 2000]; // Random delays
-  return delays.map(delay => ({
-    type: 'html-keyboard-response',
-    stimulus: '<div class="fixation">+</div>',
-    choices: ['NO_KEYS'],
-    trial_duration: delay,
-    data: { phase: 'fixation' }
-  })).concat(delays.map((delay, index) => ({
-    type: 'html-keyboard-response',
-    stimulus: '<div class="red-circle"></div>',
-    choices: [' '],
-    data: { 
-      task: 'reaction-time', 
-      trial: index + 1,
-      expected_delay: delay 
-    }
-  })));
-};
-```
-
-### Add Custom CSS
-
-Edit `experiment/styles.css`:
-
-```css
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f0f0f0;
-  margin: 0;
-  padding: 20px;
-}
-
-.red-circle {
-  width: 100px;
-  height: 100px;
-  background-color: #e74c3c;
-  border-radius: 50%;
-  margin: 50px auto;
-  display: block;
-}
-
-.fixation {
-  font-size: 48px;
-  text-align: center;
-  margin: 100px auto;
-}
-
-.instructions {
-  max-width: 600px;
-  margin: 0 auto;
-  text-align: center;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-```
-
-## Step 4: Add Data Collection
-
-Configure data collection in `aiom.config.js`:
-
-```javascript
-module.exports = {
-  experiment: {
-    title: "Reaction Time Experiment",
-    version: "1.0.0",
-    description: "Measuring simple reaction times"
-  },
-  data: {
-    format: "csv",                    // csv, json, both
-    includeMetadata: true,            // Browser info, timestamps
-    backup: true,                     // Automatic backups
-    realtime: true,                   // Live data streaming
-    fields: [                         // Custom data fields
-      'participant_id',
-      'trial_type',
-      'stimulus',
-      'response',
-      'rt',
-      'timestamp'
-    ]
-  },
-  participants: {
-    requireId: true,                  // Require participant ID
-    screening: false,                 // Enable screening questions
-    consent: true                     // Require consent form
-  }
-};
-```
-
-## Step 5: Deploy Your Experiment
-
-### Option 1: Deploy to Heroku (Recommended)
-
+- **`your_study_name`** - can be any name but no space.
+- **`tasks_in_order`** - can be any task names splitted by '/' in order according to your design. If a task name is already existed in [demos](demos.md), then corresponding templates will be used for this task; if not, AIOM will initialize a simple template (categorization task) as base code for you to customize your task. For the first-time test, I encourage you to input _categorization/your_customized_name_ to test the multi-task management, established demo and task custimization with AIOM in one run, without the need to build external endpoints serving your stimuli.
+- **`participants_entrance`** - for now, just using prolific (automatically get participant_id from url) or not (participants input id manually). 
 ```bash
-# Login to Heroku (first time only)
-heroku login
-
-# Deploy experiment
-aiom deploy heroku
+cd your_study_name  # set your study as CWD
+npm install  # build dependencies
 ```
 
-AIOM will:
-1. Create a new Heroku app
-2. Configure the database
-3. Set up SSL certificates
-4. Deploy your experiment
-5. Provide the live URL
+A typical study built by AIOM will be:
 
-### Option 2: Deploy to Your Own Server
+```
+your_study_name/                        # Generated by 'npx aiom create'
+├── .env                                # Study-level configuration (backend)
+├── app.js                              # Starting script
+├── package.json                        # Dependencies
+├── .gitignore                     
+├── custom_text/                        # Customized text in study process
+│   ├── index.html                      # Entrance
+│   ├── consent.html                    # consent form
+│   ├── pinfo.html                      # Information for participants
+│   ├── introduction.html               # Overall introduction of the study
+│   ├── early_stop.js                   # Stop the study half-way through under some condition (e.g., attention check failure)
+│   ├── debrief.js                      # Debrief after the entire study
+│   └── error.js                        # Tech issue occurs
+└── experiments/                        # Tasks defined in .env for this study
+    ├── categorization/                 # Task 1
+    │   ├── controller.js               # Task-level configuration and functions (backend)
+    │   ├── custom_text/                   
+    │   │   └── instruction.html        # Instruction for task 1
+    │   ├── public/                     # Web assets (frontend)
+    │   │   ├── experiment.ejs          # Interface
+    │   │   └── static/                 
+    │   │       ├── experiment.js       # Interactive logics for task 1
+    │   │       └── experiment.css      # Style of the interface
+    │   ├── stimuli/                    # (optional) Stimuli used in the task
+    │   ├── utils/                      # (optional) Customized modules
+    │   └── README.txt                  # Task 1 documentation
+    └── your_customized_name/           # Task 2
+        ├── controller.js               # Task-level configuration and functions (backend)
+        ├── custom_text/                   
+        │   └── instruction.html           
+        ├── public/                       
+        │   ├── experiment.ejs            
+        │   └── static/                   
+        │       ├── experiment.js         
+        │       └── experiment.css       
+        ├── stimuli/                     
+        ├── utils/                       
+        └── README.txt                   
+```
 
+Key Files/Directories for you to customize
+
+- **`.env`** - Defining key configurations of the study (e.g., participant recruitment, bonus, task sequence)
+- **`experiments/`** - Each subdirectory represents a task in your experiment sequence
+- **`experiments/your_task/controller.js`** - Backend of your task, defining key parameters of your task
+- **`experiments/your_task/public/`** - Frontend of your task, defining interactions of your task
+
+After all, give it a go
 ```bash
-# Build for production
-aiom build
-
-# Upload to your server
-aiom deploy custom --server your-server.com --user username
+npx aiom run
 ```
 
-### Option 3: Deploy to GitHub Pages (Static Only)
+You will see 
+```
+🌐 Test your task: http://localhost:3000
+🔎 View task data: http://localhost:3000/admin/db
+```
 
+To deploy the study online (on heroku) after debugging to make it public accessible: 
 ```bash
-aiom deploy github-pages
+npx aiom heroku deploy
 ```
 
-## Step 6: Monitor Your Experiment
+You will need to set up a heroku account and install heroku's CLI tool in advance.
+You will be asked to provide API key for prolific if you recruit from prolific.
 
-### Real-time Dashboard
+**Explore it and Enjoy!**
 
-Access your experiment dashboard:
+## ⚙️ More Advanced Functions
 
-```bash
-aiom dashboard
-```
-
-Or visit: `https://your-experiment-url.com/admin`
-
-Dashboard features:
-- **Live Participant Count**: See active participants
-- **Data Preview**: Real-time data collection
-- **Performance Metrics**: Response times, completion rates
-- **System Status**: Server health, error logs
-
-### Data Export
-
-Export collected data:
-
-```bash
-# Export to CSV
-aiom export csv
-
-# Export to JSON
-aiom export json
-
-# Export to SPSS
-aiom export spss
-
-# Export with date range
-aiom export csv --from 2025-01-01 --to 2025-01-31
-```
-
-## Common Experiment Types
-
-### Survey/Questionnaire
-
-```javascript
-const survey = new ExperimentBuilder()
-  .addPage({
-    type: 'survey-html-form',
-    html: `
-      <p>Please answer the following questions:</p>
-      <p>Age: <input type="number" name="age" min="18" max="100" required></p>
-      <p>Gender: 
-        <input type="radio" name="gender" value="male" required> Male
-        <input type="radio" name="gender" value="female" required> Female
-        <input type="radio" name="gender" value="other" required> Other
-      </p>
-    `
-  });
-```
-
-### Image Rating Task
-
-```javascript
-const imageRating = {
-  type: 'image-slider-response',
-  stimulus: 'assets/images/image1.jpg',
-  labels: ['Very Negative', 'Neutral', 'Very Positive'],
-  min: 1,
-  max: 7,
-  start: 4,
-  prompt: 'How do you feel about this image?'
-};
-```
-
-### Stroop Task
-
-```javascript
-const stroopTrial = {
-  type: 'html-keyboard-response',
-  stimulus: '<p style="color: red;">BLUE</p>',
-  choices: ['r', 'g', 'b'],
-  data: { 
-    word: 'BLUE', 
-    color: 'red', 
-    congruent: false 
-  }
-};
-```
-
-## Next Steps
-
-Now that you have a working experiment:
-
-1. **Explore Examples**: Check out [more complex examples](examples/advanced.md)
-2. **Learn About Plugins**: Extend functionality with [custom plugins](api/plugins.md)
-3. **Data Analysis**: Set up [analysis pipelines](guides/data-analysis.md)
-4. **Participant Recruitment**: Connect with [recruitment platforms](guides/recruitment.md)
-5. **Scale Your Research**: Learn about [advanced deployment](guides/deployment.md)
-
-## Getting Help
-
-- **Documentation**: [Complete API Reference](api/index.md)
-- **Community**: [Discord Server](https://discord.gg/aiom)
-- **Examples**: [GitHub Repository](https://github.com/HaijiangYan/AIOM/tree/main/examples)
-- **Support**: [support@aiom.dev](mailto:support@aiom.dev)
+- **For More Task Templates**: [Templates](examples/template_list.md)
+- **For Built-in Methods to customize your own task**: [APIs](api-reference.md)
+Note: These two ways are not mutually exclusive, so you can start with a established template and then customize it with provided APIs.
