@@ -27,8 +27,8 @@ nav:
     - Configuration: configuration.md
     - API Reference: api-reference.md
   - Examples:
-    - Customization: custom.md
-    - Templates: template_list.md
+    - Customization: examples/custom.md
+    - Templates: examples/template_list.md
   - Contributing: contributing.md
   - Changelog: changelog.md
 
