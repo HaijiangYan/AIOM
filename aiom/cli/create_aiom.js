@@ -2,6 +2,8 @@
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const localdownloader = require('../src/services/download.js');
+const heroku = require('../src/services/heroku.js');
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -9,20 +11,33 @@ const command = args[0];
 
 function showHelp() {
     console.log(`
-🧪 Behavioral Experiments Framework CLI
+🧪 Behavioral Experiments Framework (version ${require('../package.json').version})
 
 Usage:
-  npx aiom create [experiment-name(optional)]
-  npx aiom help
+  - Build a study
+  aiom create [study-name(optional)]
+  aiom list      # List all available task templates
 
-Commands:
-  create    Create a new experiment
-  help      Show this help message
-
-Examples:
-  npx aiom create
-  npx aiom create my-study
+  - Run a study
+  aiom run       # Start the local testing server
+  aiom download  # Download local data
+  aiom heroku    # Deployment operations
     `);
+}
+
+function listTemplates() {
+    const templatesDir = path.join(__dirname, '..', 'src', 'models');
+    fs.readdir(templatesDir, (err, files) => {
+        if (err) {
+            console.error('Error reading templates directory:', err);
+            return;
+        }
+        const templates = files.filter(file => fs.statSync(path.join(templatesDir, file)).isDirectory());
+        console.log('Available templates:');
+        templates.forEach(template => {
+            console.log(` - ${template}`);
+        });
+    });
 }
 
 async function createExperiment() {
@@ -44,7 +59,7 @@ async function createExperiment() {
             name = await ask('Experiment name: ');
         }
         
-        const type = await ask('Experiments you wish to add to this project (e.g., blockwise-MCMCP/categorization/ANY_CUSTOMIZED_NAME/...): ');
+        const type = await ask('Experiments you wish to add to this project (e.g., categorization/ANY_CUSTOMIZED_NAME/...): ');
         const prolific = await ask('Will Use Prolific? (y/n): ');
         
         const experimentDir = path.join(process.cwd(), name);
@@ -82,18 +97,13 @@ async function createExperiment() {
             description: type,
             main: "app.js",
             bin: {
-                "aiom": "./node_modules/aiom/cli/aiom.js"
+                // "aiom": "./node_modules/aiom/cli/aiom.js"
             },
             scripts: {
-                "start": "node app.js",
-                "dev": "nodemon app.js"
+                "start": "node app.js"
             },
             dependencies: {
-                "aiom": "*", 
-                "csv-writer": "^1.6.0"
-            }, 
-            devDependencies: {
-                "nodemon": "^3.0.0" 
+                "aiom": "*"
             }
         };
         
@@ -128,6 +138,7 @@ task_order=${type.replace(/\//g, '|')}
         const gitignoreContent = `node_modules/
 npm-debug.log
 db_export/
+downloads/
 .DS_Store`;
         fs.writeFileSync(path.join(experimentDir, '.gitignore'), gitignoreContent);
         console.log('\n✅ .gitignore created');
@@ -147,11 +158,10 @@ experiment.start(port);
         console.log(`\nNext steps:`);
         console.log(`  cd ${name}`);
         console.log(`  npm install`);
-        console.log(`  npx aiom run        # Start the experiment`);
-        console.log(`  npx aiom dev        # Start with auto-reload (development)`);
-        console.log(`  npx aiom download   # Show local database`);
-        console.log(`  npx aiom heroku     # Deploy to Heroku`);
-        
+        console.log(`  aiom run        # Start the experiment`);
+        console.log(`  aiom download   # Show local database`);
+        console.log(`  aiom heroku     # Deployment`);
+
     } catch (error) {
         console.error('Error creating experiment:', error);
         process.exit(1);
@@ -160,17 +170,91 @@ experiment.start(port);
     }
 }
 
-async function main() {
+async function heroku_operation() {
+    let op = args[1];
+    if (op === 'deploy') {
+        await heroku.deploy();
+    } else if (op === 'download') {
+        await heroku.download();
+    } else {
+        console.log('Usage: node heroku.js <services>');
+        console.log('aiom heroku deploy   # Deploy the app to Heroku');
+        console.log('aiom heroku download # Download data from a Heroku app');
+    }
+}
+
+async function local_download() {
+    const downloader = new localdownloader();
+    const experimentDir = process.cwd();
+    let tableName = args[1];
     try {
+        if (!tableName) {
+            // Show available tables and usage
+            const tables = await downloader.listTables();
+            console.log('📊 Available tables:');
+            tables.forEach(table => console.log(`  - ${table}`));
+            console.log('\n📝 Usage:');
+            console.log('aiom download participants   # Download participants table');
+            console.log('aiom download all            # Download all tables');
+            return;
+        } else if (tableName === 'all') {
+            await downloader.downloadAllTables(experimentDir + '/downloads');
+        } else {
+            await downloader.downloadTable(tableName, experimentDir + '/downloads');
+        }
+    } catch (error) {
+        console.error('❌ Download failed:', error.message);
+        console.error('💡 Make sure your database is running and .env is configured correctly');
+        process.exit(1);
+    } finally {
+        await downloader.close();
+    }
+}
+
+async function main() {
+    let request = true;
+    try {
+        if (command === 'list') {
+            listTemplates();
+            request = false;
+        }
+
         if (command === 'create') {
             await createExperiment();
-        } else if (command === 'help' || !command) {
+            request = false;
+        }
+        
+        if (command === 'run') {
+            request = false;
+            const { spawn } = require('child_process');
+            spawn('node', ['app.js'], {
+                shell: true,
+                cwd: process.cwd(),
+                stdio: 'inherit'
+            });
+        }
+        
+        if (command === 'download') {
+            await local_download();
+            request = false;
+        } 
+        
+        if (command === 'heroku') {
+            await heroku_operation();
+            request = false;
+        }
+        
+        if (command === 'help' || !command) {
             showHelp();
-        } else {
+            request = false;
+        }
+
+        if (request) {
             console.error(`Unknown command: ${command}`);
             showHelp();
             process.exit(1);
         }
+
         } catch (error) {
             console.error('CLI error:', error);
             process.exit(1);

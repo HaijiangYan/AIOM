@@ -6,9 +6,6 @@ var classes;
 var class_questions;
 var n_rest;
 
-var mode;
-var stimuli_attr;
-
 var current_position;
 var proposal_position;
 var current_category;
@@ -50,13 +47,6 @@ function set_up() {
         classes = response.data.classes;
         class_questions = response.data.class_questions;
         n_rest = Number(response.data.n_rest);
-        mode = response.data.mode;
-
-        if (mode === 'test') {
-            stimuli_attr = 'alt';
-        } else if (mode === 'image') {
-            stimuli_attr = 'src';
-        }
     })
     .catch((error) => {
         console.error('Error:', error);
@@ -87,8 +77,8 @@ function getChoice() {
 
             const left_attrs = { class: 'stimuli_left', height: 128, width: 128 };
             const right_attrs = { class: 'stimuli_right', height: 128, width: 128 };
-            left_attrs[stimuli_attr] = current_on_left ? response.data.current : response.data.proposal;
-            right_attrs[stimuli_attr] = current_on_left ? response.data.proposal : response.data.current;
+            left_attrs['src'] = current_on_left ? response.data.current : response.data.proposal;
+            right_attrs['src'] = current_on_left ? response.data.proposal : response.data.current;
 
             if (response.data.trial_type === 'attention_check') {
                 const attention_check = response.data.attention_check;
@@ -125,7 +115,7 @@ function getChoice() {
                 `<button class="stimuli_right" id="button_right" onclick="sendChoice_prior(1)">${right_button_text}</button>`);
             
             const question_img_attrs = { id: 'question_stimuli', height: 128, width: 128 };
-            question_img_attrs[stimuli_attr] = response.data.current_stimulus;
+            question_img_attrs['src'] = response.data.current_stimulus;
             const $question_img = $('<img>').attr(question_img_attrs);
             $(".question").html('Which option can best describe the image:<br><br>').append($question_img);
 

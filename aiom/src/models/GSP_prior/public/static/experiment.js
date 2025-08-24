@@ -6,8 +6,6 @@ var proposed_values;
 var class_question;
 var classes;
 var n_rest;
-var mode;
-var stimuli_attr;
 var stimuli_list;
 var current_category; // which class we're in by order;
 var n_trial = 1;
@@ -41,13 +39,6 @@ function set_up() {
         class_question = response.data.class_question;
         classes = Object.keys(class_question);
         n_rest = Number(response.data.n_rest);
-        mode = response.data.mode;
-
-        if (mode === 'test') {
-            stimuli_attr = 'alt';
-        } else if (mode === 'image') {
-            stimuli_attr = 'src';
-        }
     })
     .catch((error) => {
         console.error('Error:', error);
@@ -108,7 +99,7 @@ function generateOptions() {
 
     const $optionDiv = $('<div>').addClass('gsp_option');
     const $img = $('<img>')
-        .attr(stimuli_attr, stimuli_list[0])
+        .attr('src', stimuli_list[0])
         .attr('width', 128) // Set the width
         .attr('height', 128); // Set the height
     $optionDiv.append($img); // Append the image to the div
@@ -118,7 +109,7 @@ function generateOptions() {
 // Highlight the selected option based on the slider value
 function updateHighlight() {
     const sliderValue = parseInt($('#slider').val()); // Get the slider value
-    $('.gsp_option img').attr(stimuli_attr, stimuli_list[sliderValue]);
+    $('.gsp_option img').attr('src', stimuli_list[sliderValue]);
 }
 
 
@@ -250,7 +241,7 @@ function priorOptions(stimuli) {
     return $.Deferred(function(deferred) {
         // Display
         $('#priorContent p').html('Please select a category that best describes the image:');
-        $('#priorStimulus').attr(stimuli_attr, stimuli); 
+        $('#priorStimulus').attr('src', stimuli); 
         $choicesContainer = $('#priorSelect'); 
         $choicesContainer.empty(); 
 

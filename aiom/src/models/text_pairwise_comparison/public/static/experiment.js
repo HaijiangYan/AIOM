@@ -1,11 +1,6 @@
 var local_pid;
-var classes;
 var n_rest;
-var filename;
 var n_trial = 1;
-var selectd_choice;
-var stimulus_start_time;
-var reaction_time;
 const taskName = window.taskName
 const instruction_text = `/exp-static/${taskName}/instruction.html`;
 
@@ -35,92 +30,36 @@ function set_up() {
         },
     })
     .then(response => {
-        classes = response.data.classes;
         n_rest = Number(response.data.n_rest);
-
-        for (const i of classes) {
-            $('.options').append(
-                `<button id="option_${i}" class="categorization_button" onclick="sendChoice('${i}')" disabled>${i}</button>`
-            );
-        }
-
-        $('.confidence').append(
-            `<p class="confidence-text">Not sure at all&nbsp;&nbsp;</p>`
-        );
-        for (j = 1; j < 8; j++) {
-            $('.confidence').append(
-                `<button id="confidence_${j}" class="confidence_button" onclick="sendConfidence(${j})" disabled>${j}</button>`
-            );
-        }
-        $('.confidence').append(
-            `<p class="confidence-text">&nbsp;&nbsp;Completely sure</p>`
-        );
-        centerFourthButton();
-        $('.confidence-text, .confidence').css('visibility', 'hidden');
     })
     .catch((error) => {
         console.error('Error:', error);
-        alert(`Error in setting tables`);
+        errorhandler();
     });
 }
 
-function centerFourthButton() {
-    const button4 = $('#confidence_4');
-    const windowCenter = window.innerWidth / 2;
-    const button4Center = button4.offset().left + button4.outerWidth() / 2;
-    const offset = windowCenter - button4Center;
-    
-    $('.confidence').css('transform', `translateX(${offset}px)`);
-}
-
 function getChoice() {
-    axios.get(`/api/${taskName}/get_stimuli`, {
-        headers: {
-            'ID': local_pid,
-        },
-    })
+    axios.get(`/api/${taskName}/get_stimuli`)
     .then(response => {
-        filename = response.data.filename;
-        $(".stimuli").attr('src', response.data.stimulus);
+        $("#text_left").html(response.data.stimulus_group_1);
+        $("#text_right").html(response.data.stimulus_group_2);
         fadein_option();
     })
     .catch((error) => {
         console.error('Error:', error);
-        endExperiment();
+        errorhandler();
     });
 }
 
 function sendChoice(selected) {
-    reaction_time = parseInt(performance.now() - stimulus_start_time);
-    selectd_choice = selected;
-    $(`#option_${selected}`).addClass('button_highlight');
-    $('.categorization_button').prop('disabled', true);
-    $('.confidence-text, .confidence').css('visibility', 'visible');
-    $('.confidence_button').prop('disabled', false);
-}
-
-function back2unselected() {
-    $(`#option_${selectd_choice}`).removeClass('button_highlight');
-    $('.confidence_button').prop('disabled', true);
-    $('.confidence-text, .confidence').css('visibility', 'hidden');
-    $('.categorization_button').prop('disabled', false);
-}
-
-function sendConfidence(conf) {
-    // Disable all buttons after a choice is made
-    $(`#option_${selectd_choice}`).removeClass('button_highlight');
-    $('.confidence_button').prop('disabled', true);
-    $('.confidence-text, .confidence').css('visibility', 'hidden');
+    $('#button_left, #button_right').prop('disabled', true);
     axios.post(`/api/${taskName}/register_choices`, {
-        choice: selectd_choice,
-        confidence: conf,
-        rt: reaction_time,
+        choice: selected,
     }, 
         {headers: {
             'Content-Type': 'application/json',
             'ID': local_pid,
-            'n_trial': n_trial, 
-            'filename': filename,
+            'n_trial': n_trial,
         },
     })
     .then(response => {
@@ -147,7 +86,7 @@ function sendConfidence(conf) {
     })
     .catch((error) => {
         console.error('Error:', error);
-        endExperiment();
+        errorhandler();
     });
 }
 
@@ -155,19 +94,22 @@ function endExperiment() {
     window.location.href = `/experiment/${taskName}`; 
 }
 
+function errorhandler() {
+    window.location.href = '/error';
+}
+
 // UI animation
 function fadeaway_option(progress) {
-    $('.stimuli').removeClass('fade-in-horizontal').addClass('fade-out-horizontal');
+    $('#text_left, #text_right').removeClass('fade-in').addClass('fade-out');
     setTimeout(() => {
         updateProgress(progress);
     }, 100);
 }
 
 function fadein_option() {
-    $('.stimuli').removeClass('fade-out-horizontal').addClass('fade-in-horizontal');
+    $('#text_left, #text_right').removeClass('fade-out').addClass('fade-in');
     setTimeout(() => {
-        $('.categorization_button').prop('disabled', false);
-        stimulus_start_time = performance.now();
+        $('#button_left, #button_right').prop('disabled', false);
     }, 500);
 }
 

@@ -1,10 +1,10 @@
 # Quick Start Guide
 
-This guide will help you create and deploy your first experiment with AIOM in just a few minutes.
+This guide shows the simplest way that will help you create and deploy your first experiment with AIOM in just a few minutes.
 
 ## Prerequisites
 
-Firstly, make sure you have [node>=16](https://nodejs.org/en/download/prebuilt-installer) installed:
+Firstly, make sure you have [node>=18](https://nodejs.org/en/download/prebuilt-installer) installed:
 
 ```bash
 node -v
@@ -12,8 +12,8 @@ node -v
 nvm list  # if you have nvm installed on your machine
 ```
 
-Setup a postgresql database for local test with [Docker](https://docs.docker.com/get-started/get-docker/) (highly recommended)
-After installing and starting the docker, in your CLI (terminal or Windows powershell)
+AIOM provides you the best work flow with Docker for local development and verification. Setup a postgresql database for local test with [Docker](https://docs.docker.com/get-started/get-docker/)
+After installing and starting the docker desktop, in your CLI (terminal for MACOS/LINUX or WINDOWS powershell)
 ```bash
 docker -v  # check if docker runs correctly
 docker pull postgres:17.6-alpine  # get a psql image from docker hub, you can also choose another version of psql
@@ -51,17 +51,25 @@ docker rm -f aiom-postgres  # Remove the container (when done testing)
 
 ## Creating a Simple study
 
-Get your first experiment running in minutes:
-
+Install AIOM on your device:
 ```bash
-npx aiom help  # see basic usage. This line grabs the newest version of aiom temporally
-npx aiom create  # build new study
+npm install -g aiom
+
+# for mac/linux, you may need root authority by using sudo:
+sudo npm install -g aiom
+```
+
+Then, see helps and create your first study
+```bash
+aiom help  # see basic usage. This line grabs the newest version of aiom temporally
+aiom list  # see all available task templates
+aiom create  # build new study directory in you current working directory
 ```
 
 You will be prompted to input some key information to define your new study, including: 
 
-- **`your_study_name`** - can be any name but no space.
-- **`tasks_in_order`** - can be any task names splitted by '/' in order according to your design. If a task name is already existed in [demos](demos.md), then corresponding templates will be used for this task; if not, AIOM will initialize a simple template (categorization task) as base code for you to customize your task. For the first-time test, I encourage you to input _categorization/your_customized_name_ to test the multi-task management, established demo and task custimization with AIOM in one run, without the need to build external endpoints serving your stimuli.
+- **`your_study_name`** - can be any name without a space.
+- **`tasks_in_order`** - can be any task names splitted by '/' in order according to your design. If a task name is already existed in [demos](examples/template_list.md), then corresponding templates will be used for this task; if not, AIOM will initialize a simple template (categorization task) as base code for you to customize your task. For the first-time test, I encourage you to input _categorization/your_customized_name_ to test the multi-task management, established demo and task custimization with AIOM in one run, without the need to build external endpoints serving your stimuli.
 - **`participants_entrance`** - for now, just using prolific (automatically get participant_id from url) or not (participants input id manually). 
 ```bash
 cd your_study_name  # set your study as CWD
@@ -120,7 +128,7 @@ Key Files/Directories for you to customize
 
 After all, give it a go
 ```bash
-npx aiom run
+aiom run
 ```
 
 You will see 
@@ -129,9 +137,14 @@ You will see
 🔎 View task data: http://localhost:3000/admin/db
 ```
 
+To download the local experiment data from Docker psql container in currect working directory as .csv:
+```bash
+aiom download
+```
+
 To deploy the study online (on heroku) after debugging to make it public accessible: 
 ```bash
-npx aiom heroku deploy
+aiom heroku deploy
 ```
 
 You will need to set up a heroku account and install heroku's CLI tool in advance.

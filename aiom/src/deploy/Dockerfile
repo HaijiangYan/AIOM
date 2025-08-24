@@ -1,6 +1,6 @@
 # select your base image to start with
 FROM node:22.9.0-alpine3.20
-LABEL org.opencontainers.image.authors="haijiang.yan@warwick.ac.uk"
+LABEL org.opencontainers.image.authors="haijiang.r.yan@gmail.com"
 # Create app directory
 # this is the location where you will be inside the container
 WORKDIR /usr/src/app

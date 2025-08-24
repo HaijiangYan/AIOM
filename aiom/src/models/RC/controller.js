@@ -12,7 +12,7 @@ class Controller extends BaseController {
         this.n_rest = 200;
         this.modality = 'image';
         this.imageurl = 'http://localhost:8000';
-        this.stimuli_processing = this._latent2image;
+        this.stimuli_processing = this._latent2image_batch;
         this.dim = 8; // Number of dimensions for the stimuli
         this.range = {
             "0": [-10, 10], 
@@ -73,9 +73,9 @@ class Controller extends BaseController {
             await this._DB_add_row(table_name, {
                 sample: JSON.stringify(sample)
             });
-            const pcx = await this.stimuli_processing(sample);
+            const pcx = await this.stimuli_processing([sample]);
             res.status(200).json({
-                "stimulus": pcx.image
+                "stimulus": pcx[0]
             });
         } catch (error) {
             next(error);

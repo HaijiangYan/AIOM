@@ -1,5 +1,6 @@
 const { BaseController } = require('aiom');
 const { GaussianKDE: gk } = require('./utils/gatekeeper');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
@@ -8,7 +9,6 @@ class Controller extends BaseController {
         super(experimentPath, task);
         this.task = task;
         // Initialize experiment settings
-        this.mode = 'image';
         this.imageurl = 'http://localhost:8000';
         this.n_chain = 7;
         this.max_trial = 10;
@@ -33,13 +33,8 @@ class Controller extends BaseController {
             Array(this.dim).fill().map((_, j) => i === j ? this.proposal_bandwidth : 0)
         );
 
-        if (this.mode==='test') {
-            this.stimuli_processing = this._raw;
-            this.stimuli_processing_batch = this._raw;
-        } else if (this.mode==='image') {
-            this.stimuli_processing = this._latent2image;
-            this.stimuli_processing_batch = this._latent2image_batch;
-        }
+        this.stimuli_processing = this._latent2image;
+        this.stimuli_processing_batch = this._latent2image_batch;
 
         // gatekeeper settings
         this.gatekeeper = true;
@@ -120,8 +115,7 @@ class Controller extends BaseController {
           res.status(200).json({
             "classes": this.classes, 
             "class_questions": this.class_questions, 
-            "n_rest": this.n_rest, 
-            "mode": this.mode,
+            "n_rest": this.n_rest,
           });
         } catch (error) {
           next(error);
@@ -397,6 +391,64 @@ class Controller extends BaseController {
         const attention_stimulus_1 = path.join(attentionDir, attention_check_dir, s1+'.'+extension);
         const attention_stimulus_2 = path.join(attentionDir, attention_check_dir, s2+'.'+extension);
         return [attention_stimulus_1, attention_stimulus_2, [s1, s2]];
+    }
+
+    _latent2image(array) {
+        const url = new URL(this.imageurl + '/generate');
+        const postData = JSON.stringify({ vector: array });
+
+        const options = {
+            hostname: url.hostname,
+            port: url.port || 443,
+            path: url.pathname,
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+            }
+        };
+
+        return new Promise((resolve, reject) => {
+            const req = https.request(options, (res) => {
+                let data = '';
+                res.on('data', (chunk) => { data += chunk; });
+                res.on('end', () => {
+                    try {
+                        const response = JSON.parse(data);
+                        if (!response.image) {
+                            console.error('Invalid response format from image generation service:', response);
+                            resolve({
+                                image: this._noise_image(),
+                                posterior: this.classes[Math.floor(Math.random() * this.n_class)]
+                            });
+                        } else {
+                            resolve({
+                                image: `data:image/png;base64,${response.image}`,
+                                posterior: response.pred_label
+                            });
+                        }
+                    } catch (err) {
+                        console.error('Error:', err);
+                        resolve({
+                            image: this._noise_image(),
+                            posterior: this.classes[Math.floor(Math.random() * this.n_class)]
+                        });
+                    }
+                });
+            });
+
+            req.on('error', (err) => {
+                console.error('Error:', err);
+                resolve({
+                    image: this._noise_image(),
+                    posterior: this.classes[Math.floor(Math.random() * this.n_class)]
+                });
+            });
+
+            req.write(postData);
+            req.end();
+        });
     }
 }
 

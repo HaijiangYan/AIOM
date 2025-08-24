@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { createCanvas } = require('canvas');
 const axios = require('axios');
 const { pool } = require('../core/database');
 
@@ -60,32 +61,48 @@ class Controller {
         return `data:image/png;base64,${base64}`;
     }
 
-    _latent2image(array) {
-        // send a latent to a image generation service and get the image
-        const url = this.imageurl+'/generate';
-        return axios.post(url, {
-            vector: array,
-        }, {headers: {
-            'accept': 'application/json', 
-            'Content-Type': 'application/json',
-            },
-            responseType: 'json',
-        })
-        .then(response => {
-            if (!response.data.image) {
-                console.error('Invalid response format from image generation service:', response.data);
-                throw new Error('Invalid response from image generation service.');
-            }
-            return {
-                image: `data:image/png;base64,${response.data.image}`, 
-                posterior: response.data.pred_label,
-            };
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            throw error;
-        });
+    _grab_text(path_txt) {
+        // get text data from the path
+        const textData = fs.readFileSync(path_txt, 'utf-8');
+        return textData;
     }
+
+    _txt2list(filePath) {
+        const textData = this._grab_text(filePath);
+        return textData.split('\n').map(line => line.trim()).filter(line => line);
+    }
+
+    _random_choice(array) {
+        const randomIndex = Math.floor(Math.random() * array.length);
+        return array[randomIndex];
+    }
+
+    // _latent2image(array) {
+    //     // send a latent to a image generation service and get the image
+    //     const url = this.imageurl+'/generate';
+    //     return axios.post(url, {
+    //         vector: array,
+    //     }, {headers: {
+    //         'accept': 'application/json', 
+    //         'Content-Type': 'application/json',
+    //         },
+    //         responseType: 'json',
+    //     })
+    //     .then(response => {
+    //         if (!response.data.image) {
+    //             console.error('Invalid response format from image generation service:', response.data);
+    //             throw new Error('Invalid response from image generation service.');
+    //         }
+    //         return {
+    //             image: `data:image/png;base64,${response.data.image}`, 
+    //             posterior: response.data.pred_label,
+    //         };
+    //     })
+    //     .catch((error) => {
+    //         console.error('Error:', error);
+    //         throw error;
+    //     });
+    // }
 
     _latent2image_batch(obj) {
         const url = this.imageurl+'/generate_batch';
@@ -106,8 +123,24 @@ class Controller {
         })
         .catch((error) => {
             console.error('Error:', error);
-            throw error;
+            // throw error;
+            return obj.map(() => this._noise_image());
         });
+    }
+
+    _noise_image(width=64, height=64) {
+        const noiseCanvas = createCanvas(width, height);
+        const ctx = noiseCanvas.getContext('2d');
+        const imageData = ctx.createImageData(width, height);
+        for (let i = 0; i < imageData.data.length; i += 4) {
+            const value = Math.random() * 255;
+            imageData.data[i] = value;     // R
+            imageData.data[i + 1] = value; // G
+            imageData.data[i + 2] = value; // B
+            imageData.data[i + 3] = 255;   // A
+        }
+        ctx.putImageData(imageData, 0, 0);
+        return noiseCanvas.toDataURL();
     }
 
     // Shuffle an array

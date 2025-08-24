@@ -8,7 +8,6 @@ class Controller extends BaseController {
         this.task = task;
         // Initialize experiment settings
         /////////////////////// GSP settings ///////////////////////
-        this.mode = 'image';
         this.imageurl = 'http://localhost:8000';
         this.range = {
             "0": [-10, 10], 
@@ -49,11 +48,7 @@ class Controller extends BaseController {
         this.n_class = this.classes.length;
         this.max_samples_per_class = 2; // n_trial per class will be max_samples_per_class * n_dim
 
-        if (this.mode==='test') {
-            this.stimuli_processing = this._raw;
-        } else if (this.mode==='image') {
-            this.stimuli_processing = this._latent2image_batch;
-        }
+        this.stimuli_processing = this._latent2image_batch;
         /////////////////////////////////////////////////////////////
         // initialize
         this._initialize();
@@ -98,8 +93,7 @@ class Controller extends BaseController {
             }
             res.status(200).json({
                 "ordered_class_question": Object.fromEntries(shuffled_class_question), 
-                "n_rest": this.n_rest, 
-                "mode": this.mode,
+                "n_rest": this.n_rest,
             });
         } catch (error) {
             next(error);

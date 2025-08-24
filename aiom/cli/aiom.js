@@ -11,10 +11,10 @@ function showHelp() {
 🧪 Behavioral Experiments Framework CLI
 
 Usage:
-  npx aiom download  # Download local data
-  npx aiom heroku    # Heroku operations
-  npx aiom run       # Start the local testing server
-  npx aiom dev       # Start the local development server with nodemon
+  aiom download  # Download local data
+  aiom heroku    # Heroku operations
+  aiom run       # Start the local testing server
+  aiom dev       # Start the local development server with nodemon
     `);
 }
 
@@ -26,8 +26,8 @@ async function heroku_operation() {
         await heroku.download();
     } else {
         console.log('Usage: node heroku.js <services>');
-        console.log('npx aiom heroku deploy   # Deploy the app to Heroku');
-        console.log('npx aiom heroku download # Download data from a Heroku app');
+        console.log('aiom heroku deploy   # Deploy the app to Heroku');
+        console.log('aiom heroku download # Download data from a Heroku app');
     }
 }
 
@@ -42,8 +42,8 @@ async function local_download() {
             console.log('📊 Available tables:');
             tables.forEach(table => console.log(`  - ${table}`));
             console.log('\n📝 Usage:');
-            console.log('npx aiom download participants   # Download participants table');
-            console.log('npx aiom download all            # Download all tables');
+            console.log('aiom download participants   # Download participants table');
+            console.log('aiom download all            # Download all tables');
             return;
         } else if (tableName === 'all') {
             await downloader.downloadAllTables(experimentDir + '/downloads');

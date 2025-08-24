@@ -3,7 +3,7 @@ var classes;
 var n_rest;
 var filename;
 var n_trial = 1;
-var selectd_choice;
+var selected_choice;
 var stimulus_start_time;
 var reaction_time;
 const taskName = window.taskName
@@ -40,7 +40,7 @@ function set_up() {
 
         for (const i of classes) {
             $('.options').append(
-                `<button id="option_${i}" class="categorization_button" onclick="sendChoice('${i}')">${i}</button>`
+                `<button id="option_${i}" class="categorization_button" onclick="lockChoice('${i}')" disabled>${i}</button>`
             );
         }
 
@@ -90,17 +90,17 @@ function getChoice() {
     });
 }
 
-function sendChoice(selected) {
+function lockChoice(selected) {
     reaction_time = parseInt(performance.now() - stimulus_start_time);
-    selectd_choice = selected;
+    selected_choice = selected;
     $(`#option_${selected}`).addClass('button_highlight');
     $('.categorization_button').prop('disabled', true);
     $('.confidence-text, .confidence').css('visibility', 'visible');
     $('.confidence_button').prop('disabled', false);
 }
 
-function back2unselected() {
-    $(`#option_${selectd_choice}`).removeClass('button_highlight');
+function unlockChoice() {
+    $(`#option_${selected_choice}`).removeClass('button_highlight');
     $('.confidence_button').prop('disabled', true);
     $('.confidence-text, .confidence').css('visibility', 'hidden');
     $('.categorization_button').prop('disabled', false);
@@ -108,11 +108,11 @@ function back2unselected() {
 
 function sendConfidence(conf) {
     // Disable all buttons after a choice is made
-    $(`#option_${selectd_choice}`).removeClass('button_highlight');
+    $(`#option_${selected_choice}`).removeClass('button_highlight');
     $('.confidence_button').prop('disabled', true);
     $('.confidence-text, .confidence').css('visibility', 'hidden');
     axios.post(`/api/${taskName}/register_choices`, {
-        choice: selectd_choice,
+        choice: selected_choice,
         confidence: conf,
         rt: reaction_time,
     }, 

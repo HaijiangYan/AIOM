@@ -17,7 +17,7 @@
 <body>
     <div id="instructions">
         <div id="insContent">
-            <h3>Instruction - Decision-making task</h3>
+            <h3>Instruction - Categorization task</h3>
             <p style="line-height: 1.8;"></p>
 
             <hr style="border: 1px solid #ccc; margin-top: 100px; width: 100%;">
@@ -35,14 +35,17 @@
             </div>
         </div>
 
-        <div class="question">Which?</div>
-        <div class="gsp-options-container" id="choices">
-            <!-- Dynamically generated options -->
+        <div class="question">Which one looks better to you?</div>
+        <div class="text-container">
+            <div class="option">
+                <div id="text_left"></div>
+                <button id="button_left" class="text_comparison_button" onclick="sendChoice(1)" disabled>👍 Like</button>
+            </div>
+            <div class="option">
+                <div id="text_right"></div>
+                <button id="button_right" class="text_comparison_button" onclick="sendChoice(2)" disabled>👍 Like</button>
+            </div>
         </div>
-        <div class="slider-container">
-            <input type="range" id="slider" min="0" max="100" value="0" step="1">
-        </div>
-        <button id="submitButton" onclick="sendChoice()" disabled>submit</button>
     </div>
     <div id="progressBar"></div>
 
@@ -51,7 +54,6 @@
             set_up();
             show_instruction().then(function() {
                 getChoice();
-                $('#slider').on('input change', updateHighlight);
             });
         });
     </script>

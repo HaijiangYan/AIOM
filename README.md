@@ -1,4 +1,4 @@
-# All-in-One Methods (AIOM)
+# All-in-One Module (AIOM)
 
 AIOM is an integrated, flexible, configurable toolbox mainly built by Nodejs for customizing and deploying an online behavioral experiment. It provides a simple interface to build and manage your trials. 
 

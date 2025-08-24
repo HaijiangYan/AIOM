@@ -39,7 +39,7 @@ function set_up() {
 
         for (const i of classes) {
             $('.options').append(
-                `<button id="option_${i}" class="categorization_button" onclick="sendChoice('${i}')">${i}</button>`
+                `<button id="option_${i}" class="categorization_button" onclick="sendChoice('${i}')" disabled>${i}</button>`
             );
         }
 

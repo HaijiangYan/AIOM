@@ -8,7 +8,6 @@ class Controller extends BaseController {
         this.task = task;
         // Initialize experiment settings
         /////////////////////// GSP settings ///////////////////////
-        this.mode = 'image';
         this.imageurl = 'http://localhost:8000';
         this.range = {
             "0": [-10, 10], 
@@ -47,14 +46,8 @@ class Controller extends BaseController {
             this.class_question[this.classes[i]] = `Adjust the slider to match the following word as well as possible: ${this.classes[i]}`;
         }
         this.n_sample_per_class = 2; // number of trials will be n_sample_per_class * n_class * dim
-
-        if (this.mode==='test') {
-            this.stimuli_processing = this._raw;
-            this.stimuli_processing_prior = this._raw;
-        } else if (this.mode==='image') {
-            this.stimuli_processing = this._latent2image_batch;
-            this.stimuli_processing_prior = this._latent2image;
-        }
+        // function for getting stimuli
+        this.stimuli_processing = this._latent2image_batch;
         /////////////////////////////////////////////////////////////
         // initialize
         this._initialize();
@@ -100,8 +93,7 @@ class Controller extends BaseController {
             }
             res.status(200).json({
                 "class_question": this.class_question, 
-                "n_rest": this.n_rest, 
-                "mode": this.mode,
+                "n_rest": this.n_rest,
             });
         } catch (error) {
             next(error);
@@ -119,11 +111,11 @@ class Controller extends BaseController {
             const result_ = await this._DB_get_latest_row(table_name, 'sample, current_dim, current_category');
             const current_state = result_.rows[0].sample;
             const current_dim = result_.rows[0].current_dim;  // keep it <= n_dim
-            const pcx = await this.stimuli_processing_prior(current_state);
+            const pcx = await this.stimuli_processing([current_state]);
             if (current_dim === this.dim) {
                 res.status(200).json({
                     "prior": true,
-                    "stimuli": pcx.image,
+                    "stimuli": pcx[0],
                     "current_state": current_state,
                     "table_no": table_no});
             } else {
