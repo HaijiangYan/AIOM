@@ -23,21 +23,12 @@ theme:
 nav:
   - Home: index.md
   - Getting Started:
-    - Installation: installation.md
     - Quick Start: quick-start.md
     - Configuration: configuration.md
-  - API Reference:
-    - Overview: api/index.md
-    - Core Classes: api/core.md
-    - Operations: api/operations.md
-    - Utilities: api/utils.md
+    - API Reference: api-reference.md
   - Examples:
-    - Basic Usage: examples/basic.md
-    - Advanced Features: examples/advanced.md
-    - Integration Examples: examples/integration.md
-  - Guides:
-    - Best Practices: guides/best-practices.md
-    - Troubleshooting: guides/troubleshooting.md
+    - Customization: custom.md
+    - Templates: template_list.md
   - Contributing: contributing.md
   - Changelog: changelog.md
 
