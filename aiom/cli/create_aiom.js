@@ -40,7 +40,7 @@ function listTemplates() {
     });
 }
 
-async function createExperiment() {
+async function createStudy() {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
@@ -51,49 +51,49 @@ async function createExperiment() {
     }
 
     try {
-        console.log('🧪 Creating a new aiom experiment...\n');
+        console.log('🧪 Creating a new aiom study...\n');
         
         // Use command line argument or ask for name
         let name = args[1];
         if (!name) {
-            name = await ask('Experiment name: ');
+            name = await ask('Study name: ');
         }
         
-        const type = await ask('Experiments you wish to add to this project (e.g., categorization/ANY_CUSTOMIZED_NAME/...): ');
-        const prolific = await ask('Will Use Prolific? (y/n): ');
-        
-        const experimentDir = path.join(process.cwd(), name);
-        if (fs.existsSync(experimentDir)) {
-            console.error(`❌ Experiment directory "${experimentDir}" already exists. Please choose a different name.`);
+        const type = await ask('Tasks you wish to add to this study (e.g., categorization/ANY_CUSTOMIZED_NAME/...): ');
+        const prolific = await ask('Will Use Prolific for recruitment? (y/n): ');
+
+        const studyDir = path.join(process.cwd(), name);
+        if (fs.existsSync(studyDir)) {
+            console.error(`❌ Study directory "${studyDir}" already exists. Please use a different name.`);
             process.exit(1);
         }
-        // Create default customized text file
+        // Create default customized text file for your study
         fs.cpSync(
             path.join(__dirname, '..', 'src', 'templates', 'custom_text'),
-            path.join(experimentDir, 'custom_text'), 
+            path.join(studyDir, 'custom_text'), 
             { recursive: true, force: true }
         );
-
+        // copy experiment templates for your study
         const exp_types = type.split('/').map(t => t.trim());
         for (const exp_type of exp_types) {
             const srcPath = path.join(__dirname, '..', 'src', 'models', exp_type);
             if (fs.existsSync(srcPath)) {
-                fs.cpSync(srcPath, path.join(experimentDir, 'experiments', exp_type), { recursive: true, force: true });
+                fs.cpSync(srcPath, path.join(studyDir, 'experiments', exp_type), { recursive: true, force: true });
             } else {
                 // copy the completely customized template
                 fs.cpSync(
                     path.join(__dirname, '..', 'src', 'models', 'custom'),
-                    path.join(experimentDir, 'experiments', exp_type),
+                    path.join(studyDir, 'experiments', exp_type),
                     { recursive: true, force: true }
                 );
             }
         }
-        console.log('✅ Template copied successfully.');
+        console.log('✅ Templates copied successfully.');
         
         // Create package.json
         const packageJson = {
             name: name,
-            version: "1.0.0",
+            version: "0.0.1",
             description: type,
             main: "app.js",
             bin: {
@@ -108,12 +108,12 @@ async function createExperiment() {
         };
         
         fs.writeFileSync(
-            path.join(experimentDir, 'package.json'),
+            path.join(studyDir, 'package.json'),
             JSON.stringify(packageJson, null, 2)
         );
         
         // Create .env file based on your current configuration
-        let envContent = `# Database Configuration (if prolific is false)
+        let envContent = `# Database Configuration (used if prolific is false)
 DB_USER=postgres
 DB_PASSWORD=aiom
 DB_HOST=localhost
@@ -127,11 +127,11 @@ prolific_completion_bonus=1.0
 
 envContent += `
 # Multi-experiment settings
-# task order (multi: 'categorization|production', single: 'blockwise-MCMCP')
+# task order (multi-task: 'categorization|production', or single-task: 'blockwise-MCMCP'. Tasks must exist in your ./experiments)
 task_order=${type.replace(/\//g, '|')}
 `;
         
-        fs.writeFileSync(path.join(experimentDir, '.env'), envContent);
+        fs.writeFileSync(path.join(studyDir, '.env'), envContent);
         console.log('\n✅ .env created');
 
         // create .gitignore
@@ -140,7 +140,7 @@ npm-debug.log
 db_export/
 downloads/
 .DS_Store`;
-        fs.writeFileSync(path.join(experimentDir, '.gitignore'), gitignoreContent);
+        fs.writeFileSync(path.join(studyDir, '.gitignore'), gitignoreContent);
         console.log('\n✅ .gitignore created');
         
         // Create app.js
@@ -153,17 +153,17 @@ const experiment = createExperiment({
 const port = process.env.PORT || 3000;
 experiment.start(port);
 `;
-        fs.writeFileSync(path.join(experimentDir, 'app.js'), appJs);
-        console.log(`\n✅ Experiment "${name}" created successfully!`);
+        fs.writeFileSync(path.join(studyDir, 'app.js'), appJs);
+        console.log(`\n✅ Study "${name}" created successfully!`);
         console.log(`\nNext steps:`);
-        console.log(`  cd ${name}`);
-        console.log(`  npm install`);
-        console.log(`  aiom run        # Start the experiment`);
-        console.log(`  aiom download   # Show local database`);
+        console.log(`  cd ${name}      # Get in the study`);
+        console.log(`  npm install     # Install dependencies`);
+        console.log(`  aiom run        # Start the study locally`);
+        console.log(`  aiom download   # Download local data`);
         console.log(`  aiom heroku     # Deployment`);
 
     } catch (error) {
-        console.error('Error creating experiment:', error);
+        console.error('Error creating study:', error);
         process.exit(1);
     } finally {
         rl.close();
@@ -198,9 +198,9 @@ async function local_download() {
             console.log('aiom download all            # Download all tables');
             return;
         } else if (tableName === 'all') {
-            await downloader.downloadAllTables(experimentDir + '/downloads');
+            await downloader.downloadAllTables(experimentDir + '/db_export');
         } else {
-            await downloader.downloadTable(tableName, experimentDir + '/downloads');
+            await downloader.downloadTable(tableName, experimentDir + '/db_export');
         }
     } catch (error) {
         console.error('❌ Download failed:', error.message);
@@ -220,7 +220,7 @@ async function main() {
         }
 
         if (command === 'create') {
-            await createExperiment();
+            await createStudy();
             request = false;
         }
         

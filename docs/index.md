@@ -11,6 +11,7 @@ AIOM simplifies the complex process of online experimentation by providing:
 - **Deployment Tools**: Built-in deployment process with simple command
 - **Data Management**: Simple database APIs for monitoring and downloading your experiment data
 - **Recruitment Pipeline**: Good compatibility with HEROKU and PROLIFIC
+- **Faster and Smooth**: AIOM is based on NodeJS, leveraging its event-driven, non-blocking I/O model to handle high concurrency with minimal latency
 
 ## 🚀 Quick Start [Guide](quick-start.md)
 

@@ -85,7 +85,7 @@ class DataDownloader {
         }
     }
 
-    async downloadAllTables(outputDir = './downloads') {
+    async downloadAllTables(outputDir = './db_export') {
         try {
             const tables = await this.listTables();
             console.log(`📋 Found ${tables.length} tables: ${tables.join(', ')}`);

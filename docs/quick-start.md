@@ -142,9 +142,9 @@ To download the local experiment data from Docker psql container in currect work
 aiom download
 ```
 
-To deploy the study online (on heroku) after debugging to make it public accessible: 
+(Optional) To deploy the study online (on heroku) after debugging, to make it public accessible: 
 ```bash
-aiom heroku deploy
+aiom heroku  # see integration functions with Heroku
 ```
 
 You will need to set up a heroku account and install heroku's CLI tool in advance.
