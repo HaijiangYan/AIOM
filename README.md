@@ -5,7 +5,7 @@ AIOM is an integrated, flexible, configurable toolbox mainly built by Nodejs for
 ## Description
 
 **Why build AIOM?** 
-- Customizing and deploying an online experiment can be really annoying! Previously, we use tools like JSpsych or Dallinger to code up an experiment, which either be intrinsically unsuitable for the inter-linked trials or takes a very long learning curve for people without prior experiences in Web development. To solve the problem, All-in-One MCMCP application was built for general, coding-friendly use. By using AIOM, researchers are able to design and deploy a local or online MCMCP experiment with just a few clicks on GUI. Moreover, AIOM is open-sourced, which supports thorough customization for users with advanced programming skills and very specific need. Otherwise for most users, the basic functions within the GUI should be enough.
+- Customizing and deploying an online experiment can be really annoying! Previously, we use tools like JSpsych or Dallinger to code up an experiment, which either be intrinsically unsuitable for multi-task or takes a very long learning curve for people without prior experiences in Web development. To solve the problem, All-in-One Module was built for general, coding-friendly use. By using AIOM, researchers are able to design and deploy a local or online MCMCP experiment with just a few commands. Moreover, AIOM is open-sourced, which supports thorough customization for users with advanced programming skills and very specific need. Otherwise for most users, the basic templates and functions should be enough.
 
 ## Getting Started
 

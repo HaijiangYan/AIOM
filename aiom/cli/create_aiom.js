@@ -15,8 +15,8 @@ function showHelp() {
 
 Usage:
   - Build a study
-  aiom create [study-name(optional)]
-  aiom list      # List all available task templates
+  aiom create [study_name(optional)]
+  aiom list      # List all available task templates you can use in your study
 
   - Run a study
   aiom run       # Start the local testing server
@@ -33,10 +33,11 @@ function listTemplates() {
             return;
         }
         const templates = files.filter(file => fs.statSync(path.join(templatesDir, file)).isDirectory());
-        console.log('Available templates:');
-        templates.forEach(template => {
-            console.log(` - ${template}`);
-        });
+        console.log('Available task templates:');
+        // templates.forEach(template => {
+        //     console.log(` - ${template}`);
+        // });
+        console.log(templates.join(', ') + '\n');
     });
 }
 
@@ -56,10 +57,10 @@ async function createStudy() {
         // Use command line argument or ask for name
         let name = args[1];
         if (!name) {
-            name = await ask('Study name: ');
+            name = await ask('Set your study name (without spaces or hyphens): ');
         }
-        
-        const type = await ask('Tasks you wish to add to this study (e.g., categorization/ANY_CUSTOMIZED_NAME/...): ');
+        listTemplates();
+        const type = await ask('Tasks you wish to add to this study (e.g., Any_template_from_above/Any_customized_name_for_new_task/...): ');
         const prolific = await ask('Will Use Prolific for recruitment? (y/n): ');
 
         const studyDir = path.join(process.cwd(), name);

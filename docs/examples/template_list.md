@@ -1,5 +1,5 @@
 ## Available templates:
- - blockwiseMCMCP
+ - [blockwiseMCMCP](blockwiseMCMCP.md)
  - categorization
  - custom
  - GSP

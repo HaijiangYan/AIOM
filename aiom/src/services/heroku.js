@@ -53,7 +53,9 @@ async function deploy() {
     function ask(question) {
         return new Promise(resolve => rl.question(question, resolve));
     }
-    const appName = await ask('App name: ');
+    const studyName = path.basename(experimentDir);
+    const appNameInput = await ask(`App name (press ENTER to use your study name '${studyName}'): `);
+    const appName = appNameInput.trim() === '' ? studyName : appNameInput.trim();
     const region = await ask('Loaction of the App (us/eu): ');
     const dyno_type = await ask('Dyno type (eco/basic/standard-1x/standard-2x/...): ');
     const db_plan = await ask('Database plan (essential-0/essential-1/essential-2/standard-0/...): ');

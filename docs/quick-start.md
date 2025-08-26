@@ -68,8 +68,8 @@ aiom create  # build new study directory in you current working directory
 
 You will be prompted to input some key information to define your new study, including: 
 
-- **`your_study_name`** - can be any name without a space.
-- **`tasks_in_order`** - can be any task names splitted by '/' in order according to your design. If a task name is already existed in [demos](examples/template_list.md), then corresponding templates will be used for this task; if not, AIOM will initialize a simple template (categorization task) as base code for you to customize your task. For the first-time test, I encourage you to input _categorization/your_customized_name_ to test the multi-task management, established demo and task custimization with AIOM in one run, without the need to build external endpoints serving your stimuli.
+- **`your_study_name`** - can be any name without spaces and hyphens.
+- **`tasks_in_order`** - can be any task names splitted by '/' in order according to your design. If a task name is already existed in [demos](examples/template_list.md), then corresponding templates will be used for this task; if not, AIOM will initialize a simple template (categorization task) as base code for you to customize your task. For the first-time test, I advise you to input _categorization/a_customized_name_outside_templates_ to test the multi-task management, established demo and task custimization with AIOM in one run, without the need to build external endpoints serving your stimuli.
 - **`participants_entrance`** - for now, just using prolific (automatically get participant_id from url) or not (participants input id manually). 
 ```bash
 cd your_study_name  # set your study as CWD
@@ -147,7 +147,7 @@ aiom download
 aiom heroku  # see integration functions with Heroku
 ```
 
-You will need to set up a heroku account and install heroku's CLI tool in advance.
+You will need to set up a heroku account and install heroku's CLI tool in advance. [link](https://devcenter.heroku.com/articles/heroku-cli#install-the-heroku-cli)
 You will be asked to provide API key for prolific if you recruit from prolific.
 
 **Explore it and Enjoy!**

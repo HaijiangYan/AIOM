@@ -12,7 +12,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 ENV NODE_ENV=production
-
+# RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
+RUN apk add --update python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev jpeg-dev giflib-dev && rm -rf /var/cache/apk/*
 RUN npm install
 
 # Bundle app source
