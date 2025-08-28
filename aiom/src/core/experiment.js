@@ -58,8 +58,8 @@ class Experiment {
         this.app.use('/exp-static', express.static(customTextDir));
         // serve each experiment's static files
         for (const task of this.tasks) {
-            const taskinstruction = path.join(this.experimentPath, 'experiments', task, 'custom_text');
-            const taskStatic = path.join(this.experimentPath, 'experiments', task, 'public', 'static');
+            const taskinstruction = path.join(this.experimentPath, 'tasks', task, 'custom_text');
+            const taskStatic = path.join(this.experimentPath, 'tasks', task, 'public', 'static');
             this.app.use(`/exp-static/${task}`, express.static(taskinstruction));
             this.app.use(`/exp-static/${task}`, express.static(taskStatic));
         }
@@ -106,7 +106,7 @@ class Experiment {
 
         this.app.get("/experiment/:task/get_experiment_page", (req, res) => {
             const task = req.params.task;
-            const templatePath = path.join(this.experimentPath, 'experiments', task, 'public', 'experiment.ejs');
+            const templatePath = path.join(this.experimentPath, 'tasks', task, 'public', 'experiment.ejs');
             res.render(templatePath, { taskName: task });
         });
     }
@@ -145,7 +145,7 @@ class Experiment {
         const hinge = path.join(__dirname, '..', 'templates', 'base', 'hinge.ejs');
 
         if (this.tasks.length === 1) {
-            res.render(path.join(this.experimentPath, 'experiments', task, 'public', 'experiment.ejs'), { taskName: task });
+            res.render(path.join(this.experimentPath, 'tasks', task, 'public', 'experiment.ejs'), { taskName: task });
         } else {
             res.render(hinge, { stage_id: this.tasks.indexOf(task)+1, taskName: task });
         }

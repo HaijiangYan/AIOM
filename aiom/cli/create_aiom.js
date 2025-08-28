@@ -26,19 +26,47 @@ Usage:
 }
 
 function listTemplates() {
-    const templatesDir = path.join(__dirname, '..', 'src', 'models');
-    fs.readdir(templatesDir, (err, files) => {
-        if (err) {
-            console.error('Error reading templates directory:', err);
-            return;
-        }
-        const templates = files.filter(file => fs.statSync(path.join(templatesDir, file)).isDirectory());
-        console.log('Available task templates:');
-        // templates.forEach(template => {
-        //     console.log(` - ${template}`);
-        // });
-        console.log(templates.join(', ') + '\n');
+    return new Promise((resolve, reject) => {
+        const templatesDir = path.join(__dirname, '..', 'src', 'models');
+        fs.readdir(templatesDir, (err, files) => {
+            if (err) {
+                console.error('Error reading templates directory:', err);
+                return reject(err);
+            }
+            const templates = files.filter(file => fs.statSync(path.join(templatesDir, file)).isDirectory());
+            console.log('Available task templates:');
+            console.log(templates.join(', ') + '\n');
+            resolve();
+        });
     });
+}
+
+async function addTask() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    function ask(question) {
+        return new Promise(resolve => rl.question(question, resolve));
+    }
+    let task = args[1];
+    if (!task) {
+        await listTemplates();
+        task = await ask('Task to add to this study: ');
+    }
+    const srcPath = path.join(__dirname, '..', 'src', 'models', task);
+    const studyDir = process.cwd();
+    if (fs.existsSync(srcPath)) {
+        fs.cpSync(srcPath, path.join(studyDir, 'tasks', task), { recursive: true, force: true });
+    } else {
+        // copy the completely customized template
+        fs.cpSync(
+            path.join(__dirname, '..', 'src', 'models', 'custom'),
+            path.join(studyDir, 'tasks', task),
+            { recursive: true, force: true }
+        );
+    }
+    console.log(`✅ Task "${task}" added successfully, which is from the template "${fs.existsSync(srcPath) ? task : 'custom'}".`);
 }
 
 async function createStudy() {
@@ -59,7 +87,7 @@ async function createStudy() {
         if (!name) {
             name = await ask('Set your study name (without spaces or hyphens): ');
         }
-        listTemplates();
+        await listTemplates();
         const type = await ask('Tasks you wish to add to this study (e.g., Any_template_from_above/Any_customized_name_for_new_task/...): ');
         const prolific = await ask('Will Use Prolific for recruitment? (y/n): ');
 
@@ -79,12 +107,12 @@ async function createStudy() {
         for (const exp_type of exp_types) {
             const srcPath = path.join(__dirname, '..', 'src', 'models', exp_type);
             if (fs.existsSync(srcPath)) {
-                fs.cpSync(srcPath, path.join(studyDir, 'experiments', exp_type), { recursive: true, force: true });
+                fs.cpSync(srcPath, path.join(studyDir, 'tasks', exp_type), { recursive: true, force: true });
             } else {
                 // copy the completely customized template
                 fs.cpSync(
                     path.join(__dirname, '..', 'src', 'models', 'custom'),
-                    path.join(studyDir, 'experiments', exp_type),
+                    path.join(studyDir, 'tasks', exp_type),
                     { recursive: true, force: true }
                 );
             }
@@ -128,7 +156,7 @@ prolific_completion_bonus=1.0
 
 envContent += `
 # Multi-experiment settings
-# task order (multi-task: 'categorization|production', or single-task: 'blockwise-MCMCP'. Tasks must exist in your ./experiments)
+# task order (multi-task: 'categorization|production', or single-task: 'blockwise-MCMCP'. Tasks must exist in your ./tasks)
 task_order=${type.replace(/\//g, '|')}
 `;
         
@@ -216,12 +244,17 @@ async function main() {
     let request = true;
     try {
         if (command === 'list') {
-            listTemplates();
+            await listTemplates();
             request = false;
         }
 
         if (command === 'create') {
             await createStudy();
+            request = false;
+        }
+
+        if (command === 'add') {
+            await addTask();
             request = false;
         }
         

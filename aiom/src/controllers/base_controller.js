@@ -6,7 +6,7 @@ const { pool } = require('../core/database');
 
 class Controller {
     constructor(experimentPath, task) {
-        this.expPath = path.join(experimentPath, 'experiments', task);
+        this.expPath = path.join(experimentPath, 'tasks', task);
         // this._initialize();
     }
 

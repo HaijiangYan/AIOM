@@ -27,10 +27,11 @@ nav:
     - Configuration: configuration.md
     - API Reference: api-reference.md
   - Examples:
-    - Customization: examples/custom.md
+    - Customization: examples/blockwiseMCMCP.md
     - Templates: examples/template_list.md
-  - Contributing: contributing.md
-  - Changelog: changelog.md
+  - Other:
+    - Contributing: contributing.md
+    - Changelog: changelog.md
 
 markdown_extensions:
   - abbr

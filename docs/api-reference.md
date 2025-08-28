@@ -1,6 +1,6 @@
 # API Reference
 
-The AIOM Controller class provides a comprehensive set of methods for building behavioral experiments. All custom task controllers inherit from this base class.
+The AIOM Controller class provides a comprehensive set of methods for building behavioral experiments. All custom task controllers inherit from this base class. All methods which don't start with '_' will be automatically recognized and employed by the backend as an exposed enpoint when starting your experiment server. 
 
 ## Table of Contents
 

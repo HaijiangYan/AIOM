@@ -17,7 +17,7 @@ class experiment_api_router {
     }
 
     setupRoutes(task) {
-        const controller_path = path.join(this.experimentPath, 'experiments', task, 'controller.js');
+        const controller_path = path.join(this.experimentPath, 'tasks', task, 'controller.js');
         try {
             const { Controller } = require(controller_path);
             const taskController = new Controller(this.experimentPath, task);
